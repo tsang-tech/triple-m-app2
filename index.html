@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💩 99x Combo - 981 噴發慶祝版</title>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<title>💩 99x Combo - 精準噴發修復版</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   body { 
     font-family: 'Courier New', Courier, monospace; 
@@ -55,7 +55,7 @@
 
 <div id="app">
   <div id="start-screen" class="screen active">
-    <h1 style="font-family:sans-serif;">💩 981 噴發挑戰</h1>
+    <h1 style="font-family:sans-serif;">💩 1000+ 終極挑戰</h1>
     <p style="font-family:sans-serif;">30秒極速！99x Combo！<br><b>攞幾分爆幾多粒 💩！</b></p>
     <input type="text" id="player-name" placeholder="輸入名字" maxlength="10" style="font-size:1.5rem; padding:10px; width:80%; margin-bottom:10px; border-radius:8px; border:2px solid #ddd;">
     <button class="btn-primary" onclick="startGame()">開始挑戰</button>
@@ -78,7 +78,7 @@
   </div>
 
   <div id="leaderboard-screen" class="screen">
-    <div id="end-poo-icon" style="font-size:5rem;">💩</div>
+    <div id="end-poo-icon" style="font-size:5rem; margin:10px 0;">💩</div>
     <h1 id="leaderboard-title" style="font-family:sans-serif; margin:5px 0;">龍虎榜</h1>
     <p id="end-msg" style="font-size:1.1rem; font-family:sans-serif; margin:10px 0; color: #795548; font-weight: bold;"></p>
     <ul id="leaderboard-list"></ul>
@@ -182,14 +182,13 @@
   }
 
   function endGame(name) {
-    // 1. 即刻轉畫面，唔好等
     showScreen("leaderboard-screen");
     
     let personalBest = 0;
     leaderboard.forEach(e => { if(e.name === name && e.score > personalBest) personalBest = e.score; });
     let isNewPB = score > personalBest;
 
-    document.getElementById("end-msg").innerText = `最終：${score} 分！\n爆發 ${score} 粒 💩 慶祝！`;
+    document.getElementById("end-msg").innerText = `最終得分：${score} 分！\n準備接收 💩 大爆發！`;
     if (isNewPB) document.getElementById("leaderboard-title").innerText = "🏆 新紀錄爆發！";
 
     leaderboard.push({ name, score, isNewRecord: isNewPB });
@@ -199,16 +198,23 @@
     
     updateLeaderboardView(name, score);
     
-    // 2. 啟動 💩 爆發
-    setTimeout(() => { launchPooCelebration(score, isNewPB); }, 100);
+    // 加少少延遲，等畫面 Load 好再噴
+    setTimeout(() => { launchPooCelebration(score, isNewPB); }, 300);
   }
 
   function launchPooCelebration(totalScore, isNewPB) {
-    const pooEmoji = confetti.shapeFromText({ text: '💩', scalar: 2 });
-    
-    // 將總分數分成幾次爆發，每秒爆發約 1/5 嘅數量，持續 5 秒
+    if (totalScore <= 0) return; // 0分無屎派
+
+    // 安全檢查並載入💩形狀
+    let pooShape;
+    if (typeof confetti.shapeFromText === 'function') {
+      pooShape = confetti.shapeFromText({ text: '💩', scalar: 2.5 });
+    }
+
+    // 分 10 波發射，確保手機唔會被 1000 粒屎搞到當機
     const totalBursts = 10;
-    const countPerBurst = Math.ceil(totalScore / totalBursts);
+    const countPerBurst = Math.floor(totalScore / totalBursts);
+    const remainder = totalScore % totalBursts;
     let currentBurst = 0;
 
     const interval = setInterval(() => {
@@ -217,22 +223,30 @@
         return;
       }
 
-      // 如果係破紀錄，全螢幕噴；否則兩邊噴
-      if (isNewPB) {
-        confetti({
-          particleCount: countPerBurst,
-          spread: 160,
-          origin: { y: 0.6 },
-          shapes: [pooEmoji],
-          scalar: 0.7,
-          gravity: 0.8
-        });
-      } else {
-        confetti({ particleCount: Math.ceil(countPerBurst/2), angle: 60, spread: 55, origin: { x: 0 }, shapes: [pooEmoji], scalar: 0.6 });
-        confetti({ particleCount: Math.ceil(countPerBurst/2), angle: 120, spread: 55, origin: { x: 1 }, shapes: [pooEmoji], scalar: 0.6 });
+      let particlesThisBurst = countPerBurst;
+      // 最後一波將剩餘嘅數量全部補齊，一粒都不能少！
+      if (currentBurst === totalBursts - 1) {
+        particlesThisBurst += remainder; 
+      }
+
+      if (particlesThisBurst > 0) {
+        const options = {
+          particleCount: particlesThisBurst,
+          spread: isNewPB ? 160 : 80,
+          origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
+          gravity: 0.8,
+          ticks: 250, // 粒子停留時間
+          startVelocity: 35 + Math.random() * 15 // 增加噴發動態感
+        };
+
+        if (pooShape) {
+          options.shapes = [pooShape];
+        }
+        
+        confetti(options);
       }
       currentBurst++;
-    }, 400); // 每 0.4 秒爆一次，更有節奏感
+    }, 350); // 每 0.35 秒爆一波
   }
 
   function updateLeaderboardView(currentPlayerName, currentScore) {
