@@ -3,310 +3,192 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>20以內加減法挑戰</title>
+<title>20以內加減法挑戰 - 選擇題版</title>
 <style>
-  /* 整體介面風格 */
   body { 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
     text-align: center; 
     background-color: #f0f8ff; 
-    margin: 0; 
-    padding: 20px; 
+    margin: 0; padding: 20px; 
     touch-action: manipulation; 
   }
   #app { 
-    max-width: 400px; 
-    margin: 0 auto; 
-    background: white; 
-    padding: 20px; 
-    border-radius: 15px; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+    max-width: 400px; margin: 0 auto; background: white; 
+    padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
   }
-  h1 { color: #333; }
   .screen { display: none; }
   .active { display: block; }
   
-  /* 輸入框與按鈕 */
-  input[type="text"] { 
-    font-size: 1.5rem; 
-    padding: 10px; 
-    width: 80%; 
-    margin-bottom: 20px; 
-    border: 2px solid #ccc; 
-    border-radius: 8px; 
-    text-align: center; 
-  }
+  /* 按鈕樣式 */
   .btn-primary { 
-    font-size: 1.2rem; 
-    padding: 12px 30px; 
-    background-color: #4CAF50; 
-    color: white; 
-    border: none; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    font-weight: bold;
-    width: 80%;
+    font-size: 1.2rem; padding: 12px 30px; background-color: #4CAF50; 
+    color: white; border: none; border-radius: 8px; cursor: pointer; 
+    font-weight: bold; width: 80%; margin: 10px 0;
   }
-  .btn-primary:active { background-color: #45a049; }
 
   /* 遊戲介面 */
-  .stats { 
-    display: flex; 
-    justify-content: space-between; 
-    font-size: 1.5rem; 
-    font-weight: bold; 
-    margin-bottom: 10px; 
-    color: #555; 
+  .stats { display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; }
+  #question { font-size: 3.5rem; font-weight: bold; margin: 20px 0; color: #222; }
+  
+  /* 選擇題按鈕網格 */
+  .options-grid { 
+    display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; 
   }
-  #time-display { color: #d32f2f; }
-  #score-display { color: #1976d2; }
-  #question { 
-    font-size: 3.5rem; 
-    font-weight: bold; 
-    margin: 20px 0; 
-    color: #222; 
+  .option-btn { 
+    font-size: 2rem; padding: 20px; background-color: #fff; 
+    border: 3px solid #e0e0e0; border-radius: 12px; cursor: pointer;
+    transition: all 0.2s;
   }
-  #user-answer { 
-    font-size: 3rem; 
-    color: #0066cc; 
-    height: 60px; 
-    line-height: 60px;
-    margin-bottom: 20px; 
-    border-bottom: 4px dashed #ccc; 
-    width: 50%; 
-    margin-left: auto; 
-    margin-right: auto; 
+  .option-btn.selected { 
+    background-color: #e3f2fd; border-color: #2196f3; transform: scale(1.05); 
   }
 
-  /* 大型數字鍵盤 */
-  .keypad { 
-    display: grid; 
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 12px; 
-    margin-top: 10px; 
+  /* 確定按鈕 */
+  .confirm-container { margin-top: 25px; }
+  .btn-confirm { 
+    font-size: 2.5rem; width: 100%; padding: 15px; 
+    background-color: #ff9800; color: white; border: none; 
+    border-radius: 12px; cursor: pointer; box-shadow: 0 4px 0 #e68a00;
   }
-  .keypad button { 
-    font-size: 2rem; 
-    padding: 20px 0; 
-    background-color: #f9f9f9; 
-    color: #333; 
-    border: 2px solid #e0e0e0; 
-    border-radius: 12px; 
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-    cursor: pointer;
-  }
-  .keypad button:active { 
-    background-color: #e0e0e0; 
-    transform: translateY(2px);
-    box-shadow: 0 2px 3px rgba(0,0,0,0.05);
-  }
-  .keypad .btn-confirm { 
-    background-color: #ff9800; 
-    color: white; 
-    border-color: #f57c00; 
-    font-size: 2.5rem;
-  }
-  .keypad .btn-confirm:active { background-color: #e68a00; }
-  .keypad .btn-clear { 
-    background-color: #f44336; 
-    color: white; 
-    border-color: #d32f2f; 
-  }
+  .btn-confirm:active { transform: translateY(4px); box-shadow: none; }
 
   /* 龍虎榜 */
-  #leaderboard-list { 
-    list-style: none; 
-    padding: 0; 
-    font-size: 1.3rem; 
-    text-align: left; 
-    margin: 20px 0; 
-  }
-  #leaderboard-list li { 
-    display: flex; 
-    justify-content: space-between; 
-    padding: 12px 10px; 
-    border-bottom: 1px solid #eee; 
-  }
-  #leaderboard-list li span:nth-child(1) { font-weight: bold; color: #333; }
-  #leaderboard-list li span:nth-child(2) { color: #e91e63; font-weight: bold; }
+  #leaderboard-list { list-style: none; padding: 0; font-size: 1.2rem; text-align: left; }
+  #leaderboard-list li { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
 </style>
 </head>
 <body>
 
 <div id="app">
-  
   <div id="start-screen" class="screen active">
-    <h1>🚀 20以內加減法挑戰</h1>
-    <p>30秒限時，鬥快答對最多！</p>
-    <input type="text" id="player-name" placeholder="輸入你的大名" maxlength="10">
-    <br>
+    <h1>🚀 數學挑戰 (選擇題)</h1>
+    <input type="text" id="player-name" placeholder="輸入你的大名" maxlength="10" style="font-size:1.5rem; padding:10px; width:80%; margin-bottom:20px;">
     <button class="btn-primary" onclick="startGame()">開始遊戲</button>
-    <br><br>
-    <button class="btn-primary" style="background-color: #9c27b0;" onclick="showLeaderboardOnly()">查看龍虎榜</button>
+    <button class="btn-primary" style="background-color: #9c27b0;" onclick="showLeaderboardOnly()">龍虎榜</button>
   </div>
 
   <div id="game-screen" class="screen">
     <div class="stats">
-      <div id="time-display">⏱ <span id="time">30</span>s</div>
-      <div id="score-display">⭐ <span id="score">0</span></div>
+      <div style="color:#d32f2f">⏱ <span id="time">30</span>s</div>
+      <div style="color:#1976d2">⭐ <span id="score">0</span></div>
     </div>
-    <div id="question">5 + 5 =</div>
-    <div id="user-answer"></div>
+    <div id="question">-- + -- =</div>
     
-    <div class="keypad">
-      <button onclick="pressKey(1)">1</button>
-      <button onclick="pressKey(2)">2</button>
-      <button onclick="pressKey(3)">3</button>
-      <button onclick="pressKey(4)">4</button>
-      <button onclick="pressKey(5)">5</button>
-      <button onclick="pressKey(6)">6</button>
-      <button onclick="pressKey(7)">7</button>
-      <button onclick="pressKey(8)">8</button>
-      <button onclick="pressKey(9)">9</button>
-      <button class="btn-clear" onclick="clearInput()">C</button>
-      <button onclick="pressKey(0)">0</button>
-      <button class="btn-confirm" onclick="submitAnswer()">✔</button>
+    <div class="options-grid" id="options-container">
+      </div>
+
+    <div class="confirm-container">
+      <button class="btn-confirm" onclick="submitAnswer()">✔ 確定</button>
     </div>
   </div>
 
   <div id="leaderboard-screen" class="screen">
     <h1>🏆 龍虎榜</h1>
     <ul id="leaderboard-list"></ul>
-    <button class="btn-primary" onclick="showScreen('start-screen')">返回主選單</button>
+    <button class="btn-primary" onclick="location.reload()">返回主頁</button>
   </div>
-
 </div>
 
 <script>
-  let playerName = "";
-  let score = 0;
-  let timeLeft = 30;
-  let timerInterval;
-  let correctAnswer = 0;
-  let currentInput = "";
+  let score = 0, timeLeft = 30, timerInterval, correctAnswer, selectedAnswer = null;
   let leaderboard = JSON.parse(localStorage.getItem("mathGameLeaderboard")) || [];
 
-  function showScreen(screenId) {
+  function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
+    document.getElementById(id).classList.add('active');
   }
 
   function startGame() {
-    playerName = document.getElementById("player-name").value.trim();
-    if (!playerName) {
-      alert("喂喂，輸入咗名先可以挑戰㗎！");
-      return;
-    }
+    let name = document.getElementById("player-name").value.trim();
+    if (!name) return alert("請輸入名字！");
     
-    score = 0;
-    timeLeft = 30;
+    score = 0; timeLeft = 30;
     document.getElementById("score").innerText = score;
-    document.getElementById("time").innerText = timeLeft;
-    currentInput = "";
-    updateInputDisplay();
-    
     showScreen("game-screen");
     generateQuestion();
     
     timerInterval = setInterval(() => {
       timeLeft--;
       document.getElementById("time").innerText = timeLeft;
-      if (timeLeft <= 0) {
-        endGame();
-      }
+      if (timeLeft <= 0) endGame(name);
     }, 1000);
   }
 
-  // --- 更新咗嘅出題邏輯 ---
   function generateQuestion() {
-    let isAddition = Math.random() > 0.5;
-    let num1, num2;
+    let isAdd = Math.random() > 0.5;
+    let n1 = Math.floor(Math.random() * 21);
+    let n2 = Math.floor(Math.random() * 21);
     
-    if (isAddition) {
-      // 加法：被加數同加數各自都可以係 0-20
-      num1 = Math.floor(Math.random() * 21); 
-      num2 = Math.floor(Math.random() * 21); 
-      correctAnswer = num1 + num2;
-      document.getElementById("question").innerText = `${num1} + ${num2} =`;
+    if (isAdd) {
+      correctAnswer = n1 + n2;
+      document.getElementById("question").innerText = `${n1} + ${n2} =`;
     } else {
-      // 減法：先抽出 0-20 嘅被減數，再確保減數細過或等於被減數
-      num1 = Math.floor(Math.random() * 21); 
-      num2 = Math.floor(Math.random() * (num1 + 1)); 
-      correctAnswer = num1 - num2;
-      document.getElementById("question").innerText = `${num1} - ${num2} =`;
+      if (n1 < n2) [n1, n2] = [n2, n1]; // 確保大減細
+      correctAnswer = n1 - n2;
+      document.getElementById("question").innerText = `${n1} - ${n2} =`;
     }
-    
-    currentInput = "";
-    updateInputDisplay();
+
+    selectedAnswer = null;
+    displayOptions();
   }
 
-  function pressKey(num) {
-    if (currentInput.length < 2) {
-      currentInput += num;
-      updateInputDisplay();
+  function displayOptions() {
+    let options = [correctAnswer];
+    // 生成三個不重複的干擾項
+    while (options.length < 4) {
+      let offset = Math.floor(Math.random() * 7) - 3; // 正負3之內
+      let wrong = correctAnswer + offset;
+      if (wrong >= 0 && !options.includes(wrong)) {
+        options.push(wrong);
+      }
     }
-  }
+    // 隨機打亂順序
+    options.sort(() => Math.random() - 0.5);
 
-  function clearInput() {
-    currentInput = "";
-    updateInputDisplay();
-  }
-
-  function updateInputDisplay() {
-    document.getElementById("user-answer").innerText = currentInput;
+    const container = document.getElementById("options-container");
+    container.innerHTML = "";
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.innerText = opt;
+      btn.onclick = () => {
+        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedAnswer = opt;
+      };
+      container.appendChild(btn);
+    });
   }
 
   function submitAnswer() {
-    if (currentInput === "") return;
+    if (selectedAnswer === null) return;
     
-    if (parseInt(currentInput) === correctAnswer) {
+    if (selectedAnswer === correctAnswer) {
       score++;
       document.getElementById("score").innerText = score;
-      generateQuestion(); 
+      generateQuestion();
     } else {
-      let answerBox = document.getElementById("user-answer");
-      answerBox.style.color = "red";
-      setTimeout(() => {
-        answerBox.style.color = "#0066cc";
-        clearInput();
-      }, 200);
+      // 答錯閃紅提示
+      document.querySelector('.selected').style.backgroundColor = "#ffcdd2";
+      setTimeout(generateQuestion, 200);
     }
   }
 
-  function endGame() {
+  function endGame(name) {
     clearInterval(timerInterval);
-    alert(`時間到！\n${playerName}，你總共答對咗 ${score} 題！`);
-    
-    leaderboard.push({ name: playerName, score: score });
+    alert(`遊戲結束！${name} 答對了 ${score} 題！`);
+    leaderboard.push({ name, score });
     leaderboard.sort((a, b) => b.score - a.score);
-    leaderboard = leaderboard.slice(0, 10); 
+    leaderboard = leaderboard.slice(0, 10);
     localStorage.setItem("mathGameLeaderboard", JSON.stringify(leaderboard));
-    
     showLeaderboardOnly();
   }
 
   function showLeaderboardOnly() {
     showScreen("leaderboard-screen");
-    let list = document.getElementById("leaderboard-list");
-    list.innerHTML = "";
-    
-    if (leaderboard.length === 0) {
-      list.innerHTML = "<li><span>暫時未有紀錄，快啲做第一人！</span></li>";
-      return;
-    }
-
-    leaderboard.forEach((entry, index) => {
-      let li = document.createElement("li");
-      let medal = "";
-      if(index === 0) medal = "🥇 ";
-      else if(index === 1) medal = "🥈 ";
-      else if(index === 2) medal = "🥉 ";
-      
-      li.innerHTML = `<span>${medal}${index + 1}. ${entry.name}</span> <span>${entry.score} 分</span>`;
-      list.appendChild(li);
-    });
+    const list = document.getElementById("leaderboard-list");
+    list.innerHTML = leaderboard.map((e, i) => `<li><span>${i+1}. ${e.name}</span> <span>${e.score}分</span></li>`).join("");
   }
 </script>
-
 </body>
 </html>
