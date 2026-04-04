@@ -1,223 +1,312 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-HK">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>田徑成績 & 獲獎紀錄</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 0 auto; padding: 15px; background-color: #f0f2f5; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        h2 { color: #1a73e8; margin-top: 0; font-size: 1.1rem; border-left: 4px solid #1a73e8; padding-left: 10px; margin-bottom: 15px; }
-        .form-group { margin-bottom: 12px; }
-        select, input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        .btn-group { display: flex; gap: 8px; margin-top: 10px; }
-        button { background: #1a73e8; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: bold; }
-        .btn-secondary { background: #5f6368; }
-        .btn-export { background: #34a853; }
-        .btn-danger { background: #ea4335; font-size: 0.8rem; padding: 8px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
-        th, td { border-bottom: 1px solid #eee; padding: 12px 8px; text-align: left; }
-        th { color: #888; font-weight: 500; }
-        .award-tag { color: #d9480f; font-weight: bold; font-size: 0.8rem; display: block; }
-        .chart-container { position: relative; height: 300px; width: 100%; margin-top: 10px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>20以內加減法挑戰</title>
+<style>
+  /* 整體介面風格 */
+  body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    text-align: center; 
+    background-color: #f0f8ff; 
+    margin: 0; 
+    padding: 20px; 
+    touch-action: manipulation; 
+  }
+  #app { 
+    max-width: 400px; 
+    margin: 0 auto; 
+    background: white; 
+    padding: 20px; 
+    border-radius: 15px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+  }
+  h1 { color: #333; }
+  .screen { display: none; }
+  .active { display: block; }
+  
+  /* 輸入框與按鈕 */
+  input[type="text"] { 
+    font-size: 1.5rem; 
+    padding: 10px; 
+    width: 80%; 
+    margin-bottom: 20px; 
+    border: 2px solid #ccc; 
+    border-radius: 8px; 
+    text-align: center; 
+  }
+  .btn-primary { 
+    font-size: 1.2rem; 
+    padding: 12px 30px; 
+    background-color: #4CAF50; 
+    color: white; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-weight: bold;
+    width: 80%;
+  }
+  .btn-primary:active { background-color: #45a049; }
+
+  /* 遊戲介面 */
+  .stats { 
+    display: flex; 
+    justify-content: space-between; 
+    font-size: 1.5rem; 
+    font-weight: bold; 
+    margin-bottom: 10px; 
+    color: #555; 
+  }
+  #time-display { color: #d32f2f; }
+  #score-display { color: #1976d2; }
+  #question { 
+    font-size: 3.5rem; 
+    font-weight: bold; 
+    margin: 20px 0; 
+    color: #222; 
+  }
+  #user-answer { 
+    font-size: 3rem; 
+    color: #0066cc; 
+    height: 60px; 
+    line-height: 60px;
+    margin-bottom: 20px; 
+    border-bottom: 4px dashed #ccc; 
+    width: 50%; 
+    margin-left: auto; 
+    margin-right: auto; 
+  }
+
+  /* 大型數字鍵盤 */
+  .keypad { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 12px; 
+    margin-top: 10px; 
+  }
+  .keypad button { 
+    font-size: 2rem; 
+    padding: 20px 0; 
+    background-color: #f9f9f9; 
+    color: #333; 
+    border: 2px solid #e0e0e0; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+    cursor: pointer;
+  }
+  .keypad button:active { 
+    background-color: #e0e0e0; 
+    transform: translateY(2px);
+    box-shadow: 0 2px 3px rgba(0,0,0,0.05);
+  }
+  .keypad .btn-confirm { 
+    background-color: #ff9800; 
+    color: white; 
+    border-color: #f57c00; 
+    font-size: 2.5rem;
+  }
+  .keypad .btn-confirm:active { background-color: #e68a00; }
+  .keypad .btn-clear { 
+    background-color: #f44336; 
+    color: white; 
+    border-color: #d32f2f; 
+  }
+
+  /* 龍虎榜 */
+  #leaderboard-list { 
+    list-style: none; 
+    padding: 0; 
+    font-size: 1.3rem; 
+    text-align: left; 
+    margin: 20px 0; 
+  }
+  #leaderboard-list li { 
+    display: flex; 
+    justify-content: space-between; 
+    padding: 12px 10px; 
+    border-bottom: 1px solid #eee; 
+  }
+  #leaderboard-list li span:nth-child(1) { font-weight: bold; color: #333; }
+  #leaderboard-list li span:nth-child(2) { color: #e91e63; font-weight: bold; }
+</style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>📝 錄入成績與獎項</h2>
-        <div class="form-group">
-            <input type="date" id="date">
-        </div>
-        <div class="form-group">
-            <input type="text" id="compName" placeholder="比賽名稱 (例: 2026校運會)">
-        </div>
-        <div class="btn-group">
-            <select id="athlete" style="flex:1">
-                <option value="Mason">Mason</option>
-                <option value="Megan">Megan</option>
-                <option value="Margaret">Margaret</option>
-            </select>
-            <select id="event" style="flex:2"></select>
-        </div>
-        <div class="form-group" style="margin-top:10px;">
-            <input type="number" id="result" step="0.01" placeholder="成績 (秒 或 公尺)">
-        </div>
-        <div class="form-group">
-            <input type="text" id="award" placeholder="獲獎紀錄 (例: 冠軍 / 季軍 / 優異獎)">
-        </div>
-        <button onclick="saveRecord()">儲存紀錄</button>
-    </div>
+<div id="app">
+  
+  <div id="start-screen" class="screen active">
+    <h1>🚀 20以內加減法挑戰</h1>
+    <p>30秒限時，鬥快答對最多！</p>
+    <input type="text" id="player-name" placeholder="輸入你的大名" maxlength="10">
+    <br>
+    <button class="btn-primary" onclick="startGame()">開始遊戲</button>
+    <br><br>
+    <button class="btn-primary" style="background-color: #9c27b0;" onclick="showLeaderboardOnly()">查看龍虎榜</button>
+  </div>
 
-    <div class="card">
-        <h2>📈 進步曲線</h2>
-        <select id="viewEvent" onchange="updateChart()"></select>
-        <div class="chart-container">
-            <canvas id="progressChart"></canvas>
-        </div>
+  <div id="game-screen" class="screen">
+    <div class="stats">
+      <div id="time-display">⏱ <span id="time">30</span>s</div>
+      <div id="score-display">⭐ <span id="score">0</span></div>
     </div>
+    <div id="question">5 + 5 =</div>
+    <div id="user-answer"></div>
+    
+    <div class="keypad">
+      <button onclick="pressKey(1)">1</button>
+      <button onclick="pressKey(2)">2</button>
+      <button onclick="pressKey(3)">3</button>
+      <button onclick="pressKey(4)">4</button>
+      <button onclick="pressKey(5)">5</button>
+      <button onclick="pressKey(6)">6</button>
+      <button onclick="pressKey(7)">7</button>
+      <button onclick="pressKey(8)">8</button>
+      <button onclick="pressKey(9)">9</button>
+      <button class="btn-clear" onclick="clearInput()">C</button>
+      <button onclick="pressKey(0)">0</button>
+      <button class="btn-confirm" onclick="submitAnswer()">✔</button>
+    </div>
+  </div>
 
-    <div class="card">
-        <h2>💾 數據管理</h2>
-        <div class="btn-group">
-            <button class="btn-export" onclick="exportCSV()">導出 CSV 備份</button>
-            <button class="btn-secondary" onclick="document.getElementById('importFile').click()">匯入備份</button>
-            <input type="file" id="importFile" style="display:none" onchange="importCSV(event)">
-        </div>
-    </div>
+  <div id="leaderboard-screen" class="screen">
+    <h1>🏆 龍虎榜</h1>
+    <ul id="leaderboard-list"></ul>
+    <button class="btn-primary" onclick="showScreen('start-screen')">返回主選單</button>
+  </div>
 
-    <div class="card">
-        <h2>🏆 歷史紀錄 (最近 15 條)</h2>
-        <table id="historyTable">
-            <thead><tr><th>日期/項目</th><th>姓名</th><th>成績/獎項</th><th>操作</th></tr></thead>
-            <tbody></tbody>
-        </table>
-        <button class="btn-danger" onclick="clearAll()" style="width:auto; margin-top:15px; background: none; color: #888; border: 1px solid #ccc;">清空數據</button>
-    </div>
+</div>
 
 <script>
-    const events = ["20米", "30米", "30米欄", "60米", "60米欄", "100米", "200米", "400米", "800米", "立定跳遠", "跳遠", "擲豆袋", "擲壘球", "擲火箭槍"];
-    const trackEvents = ["20米", "30米", "30米欄", "60米", "60米欄", "100米", "200米", "400米", "800米"];
+  let playerName = "";
+  let score = 0;
+  let timeLeft = 30;
+  let timerInterval;
+  let correctAnswer = 0;
+  let currentInput = "";
+  let leaderboard = JSON.parse(localStorage.getItem("mathGameLeaderboard")) || [];
 
-    let records = JSON.parse(localStorage.getItem('sportsRecords')) || [];
-    let myChart;
+  function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+  }
 
-    const eventSelect = document.getElementById('event');
-    const viewEventSelect = document.getElementById('viewEvent');
-    events.forEach(e => {
-        eventSelect.add(new Option(e, e));
-        viewEventSelect.add(new Option(e, e));
+  function startGame() {
+    playerName = document.getElementById("player-name").value.trim();
+    if (!playerName) {
+      alert("喂喂，輸入咗名先可以挑戰㗎！");
+      return;
+    }
+    
+    score = 0;
+    timeLeft = 30;
+    document.getElementById("score").innerText = score;
+    document.getElementById("time").innerText = timeLeft;
+    currentInput = "";
+    updateInputDisplay();
+    
+    showScreen("game-screen");
+    generateQuestion();
+    
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      document.getElementById("time").innerText = timeLeft;
+      if (timeLeft <= 0) {
+        endGame();
+      }
+    }, 1000);
+  }
+
+  // --- 更新咗嘅出題邏輯 ---
+  function generateQuestion() {
+    let isAddition = Math.random() > 0.5;
+    let num1, num2;
+    
+    if (isAddition) {
+      // 加法：被加數同加數各自都可以係 0-20
+      num1 = Math.floor(Math.random() * 21); 
+      num2 = Math.floor(Math.random() * 21); 
+      correctAnswer = num1 + num2;
+      document.getElementById("question").innerText = `${num1} + ${num2} =`;
+    } else {
+      // 減法：先抽出 0-20 嘅被減數，再確保減數細過或等於被減數
+      num1 = Math.floor(Math.random() * 21); 
+      num2 = Math.floor(Math.random() * (num1 + 1)); 
+      correctAnswer = num1 - num2;
+      document.getElementById("question").innerText = `${num1} - ${num2} =`;
+    }
+    
+    currentInput = "";
+    updateInputDisplay();
+  }
+
+  function pressKey(num) {
+    if (currentInput.length < 2) {
+      currentInput += num;
+      updateInputDisplay();
+    }
+  }
+
+  function clearInput() {
+    currentInput = "";
+    updateInputDisplay();
+  }
+
+  function updateInputDisplay() {
+    document.getElementById("user-answer").innerText = currentInput;
+  }
+
+  function submitAnswer() {
+    if (currentInput === "") return;
+    
+    if (parseInt(currentInput) === correctAnswer) {
+      score++;
+      document.getElementById("score").innerText = score;
+      generateQuestion(); 
+    } else {
+      let answerBox = document.getElementById("user-answer");
+      answerBox.style.color = "red";
+      setTimeout(() => {
+        answerBox.style.color = "#0066cc";
+        clearInput();
+      }, 200);
+    }
+  }
+
+  function endGame() {
+    clearInterval(timerInterval);
+    alert(`時間到！\n${playerName}，你總共答對咗 ${score} 題！`);
+    
+    leaderboard.push({ name: playerName, score: score });
+    leaderboard.sort((a, b) => b.score - a.score);
+    leaderboard = leaderboard.slice(0, 10); 
+    localStorage.setItem("mathGameLeaderboard", JSON.stringify(leaderboard));
+    
+    showLeaderboardOnly();
+  }
+
+  function showLeaderboardOnly() {
+    showScreen("leaderboard-screen");
+    let list = document.getElementById("leaderboard-list");
+    list.innerHTML = "";
+    
+    if (leaderboard.length === 0) {
+      list.innerHTML = "<li><span>暫時未有紀錄，快啲做第一人！</span></li>";
+      return;
+    }
+
+    leaderboard.forEach((entry, index) => {
+      let li = document.createElement("li");
+      let medal = "";
+      if(index === 0) medal = "🥇 ";
+      else if(index === 1) medal = "🥈 ";
+      else if(index === 2) medal = "🥉 ";
+      
+      li.innerHTML = `<span>${medal}${index + 1}. ${entry.name}</span> <span>${entry.score} 分</span>`;
+      list.appendChild(li);
     });
-    document.getElementById('date').valueAsDate = new Date();
-
-    function saveRecord() {
-        const resultVal = document.getElementById('result').value;
-        if(!resultVal) return alert("請輸入成績！");
-
-        const record = {
-            id: Date.now(),
-            date: document.getElementById('date').value,
-            comp: document.getElementById('compName').value || "平日練習",
-            name: document.getElementById('athlete').value,
-            event: document.getElementById('event').value,
-            result: parseFloat(resultVal),
-            award: document.getElementById('award').value || ""
-        };
-
-        records.push(record);
-        saveAndRender();
-        document.getElementById('result').value = "";
-        document.getElementById('award').value = "";
-        alert("紀錄成功！");
-    }
-
-    function saveAndRender() {
-        localStorage.setItem('sportsRecords', JSON.stringify(records));
-        renderTable();
-        updateChart();
-    }
-
-    function exportCSV() {
-        if(records.length === 0) return alert("沒有數據");
-        let csv = "\uFEFF日期,比賽,姓名,項目,成績,獲獎\n";
-        records.forEach(r => {
-            csv += `${r.date},${r.comp},${r.name},${r.event},${r.result},${r.award}\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `三M紀錄_${new Date().toISOString().slice(0,10)}.csv`;
-        link.click();
-    }
-
-    function importCSV(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const lines = e.target.result.split('\n');
-            const newRecords = [];
-            for(let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split(',');
-                if(cols.length >= 5) {
-                    newRecords.push({
-                        id: Date.now() + i,
-                        date: cols[0], comp: cols[1], name: cols[2], event: cols[3],
-                        result: parseFloat(cols[4]), award: cols[5] ? cols[5].trim() : ""
-                    });
-                }
-            }
-            if(confirm(`匯入 ${newRecords.length} 條數據？`)) {
-                records = newRecords;
-                saveAndRender();
-            }
-        };
-        reader.readAsText(file);
-    }
-
-    function renderTable() {
-        const tbody = document.querySelector('#historyTable tbody');
-        // 只顯示最近 15 條
-        tbody.innerHTML = records.slice().reverse().slice(0, 15).map(r => `
-            <tr>
-                <td>${r.date.slice(5)}<br><small style="color:#888">${r.event}</small></td>
-                <td>${r.name}</td>
-                <td>
-                    <b>${r.result}${trackEvents.includes(r.event) ? 's' : 'm'}</b>
-                    ${r.award ? `<span class="award-tag">🏆 ${r.award}</span>` : ''}
-                </td>
-                <td><button class="btn-danger" style="padding:2px 6px" onclick="deleteRecord(${r.id})">×</button></td>
-            </tr>
-        `).join('');
-    }
-
-    function updateChart() {
-        const ctx = document.getElementById('progressChart').getContext('2d');
-        const selectedEvent = document.getElementById('viewEvent').value;
-        const isTrack = trackEvents.includes(selectedEvent);
-        const colors = { 'Mason': '#1a73e8', 'Megan': '#e91e63', 'Margaret': '#34a853' };
-
-        const filtered = records.filter(r => r.event === selectedEvent).sort((a,b) => new Date(a.date) - new Date(b.date));
-        const datasets = ["Mason", "Megan", "Margaret"].map(name => ({
-            label: name,
-            data: filtered.filter(r => r.name === name).map(r => ({ x: r.date, y: r.result })),
-            borderColor: colors[name],
-            backgroundColor: colors[name],
-            tension: 0.3,
-            fill: false
-        }));
-
-        if (myChart) myChart.destroy();
-        myChart = new Chart(ctx, {
-            type: 'line',
-            data: { datasets },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { reverse: isTrack, title: { display: true, text: isTrack ? '秒 (越低越好)' : '公尺 (越高越好)' } }
-                }
-            }
-        });
-    }
-
-    function deleteRecord(id) {
-        if(confirm("確定刪除嗎？")) {
-            records = records.filter(r => r.id !== id);
-            saveAndRender();
-        }
-    }
-
-    function clearAll() {
-        if(confirm("確定清空所有數據？")) {
-            records = [];
-            saveAndRender();
-        }
-    }
-
-    renderAll();
-    function renderAll() { renderTable(); updateChart(); }
+  }
 </script>
+
 </body>
 </html>
