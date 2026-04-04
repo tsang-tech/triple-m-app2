@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💩 99x Combo - 精準噴發修復版</title>
+<title>💩 音樂節奏 99x Combo 版</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   body { 
@@ -25,7 +25,12 @@
   }
   .show-feedback { opacity: 1 !important; transform: scale(1.1); }
 
-  .stats { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: bold; font-family: sans-serif; }
+  .stats { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: bold; font-family: sans-serif; align-items: center;}
+  
+  /* 計時器跳動特效 */
+  #time-container { color:#d32f2f; transition: transform 0.1s; display: inline-block; }
+  .time-warning { transform: scale(1.4); font-weight: 900; }
+
   .combo-text { color: #ff5722; font-size: 1.2rem; font-weight: bold; margin: 5px 0; font-family: sans-serif; min-height: 1.5rem;}
   
   .math-container { display: flex; justify-content: center; margin: 15px 0; }
@@ -53,17 +58,21 @@
 </head>
 <body>
 
+<audio id="audio-bgm" src="bgm.mp3" loop></audio>
+<audio id="audio-tick" src="tick.mp3"></audio>
+<audio id="audio-win" src="win.mp3"></audio>
+
 <div id="app">
   <div id="start-screen" class="screen active">
-    <h1 style="font-family:sans-serif;">💩 1000+ 終極挑戰</h1>
-    <p style="font-family:sans-serif;">30秒極速！99x Combo！<br><b>攞幾分爆幾多粒 💩！</b></p>
+    <h1 style="font-family:sans-serif;">💩 極速算術挑戰</h1>
+    <p style="font-family:sans-serif;">記得開聲！30秒極速！<br><b>細小可愛 💩 滿天飛！</b></p>
     <input type="text" id="player-name" placeholder="輸入名字" maxlength="10" style="font-size:1.5rem; padding:10px; width:80%; margin-bottom:10px; border-radius:8px; border:2px solid #ddd;">
     <button class="btn-primary" onclick="startGame()">開始挑戰</button>
   </div>
 
   <div id="game-screen" class="screen">
     <div class="stats">
-      <div style="color:#d32f2f">⏱ <span id="time">30</span>s</div>
+      <div id="time-container">⏱ <span id="time">30</span>s</div>
       <div style="color:#1976d2">⭐ <span id="score">0</span></div>
     </div>
     <div id="combo-display" class="combo-text">Combo: 0</div>
@@ -91,6 +100,11 @@
   let combo = 0, questionStartTime = 0, gameActive = false;
   let leaderboard = JSON.parse(localStorage.getItem("mathGameLeaderboard")) || [];
   
+  // 獲取音效元素
+  const audioBgm = document.getElementById("audio-bgm");
+  const audioTick = document.getElementById("audio-tick");
+  const audioWin = document.getElementById("audio-win");
+
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
@@ -102,11 +116,27 @@
     score = 0; timeLeft = 30; combo = 0; gameActive = true;
     updateStats();
     showScreen("game-screen");
+    
+    // 開始播放背景音樂
+    audioBgm.currentTime = 0;
+    audioBgm.play().catch(e => console.log("瀏覽器阻擋自動播放", e));
+
     generateQuestion();
     
     timerInterval = setInterval(() => {
       timeLeft--;
       document.getElementById("time").innerText = timeLeft;
+      
+      // 最後 5 秒特效同音效
+      if (timeLeft <= 5 && timeLeft > 0) {
+        const timeBox = document.getElementById("time-container");
+        timeBox.classList.add("time-warning");
+        setTimeout(() => timeBox.classList.remove("time-warning"), 200);
+        
+        audioTick.currentTime = 0;
+        audioTick.play().catch(e=>e);
+      }
+
       if (timeLeft <= 0) {
         gameActive = false;
         clearInterval(timerInterval);
@@ -182,14 +212,19 @@
   }
 
   function endGame(name) {
+    // 停背景音樂，播勝利音樂
+    audioBgm.pause();
+    audioWin.currentTime = 0;
+    audioWin.play().catch(e=>e);
+
     showScreen("leaderboard-screen");
     
     let personalBest = 0;
     leaderboard.forEach(e => { if(e.name === name && e.score > personalBest) personalBest = e.score; });
     let isNewPB = score > personalBest;
 
-    document.getElementById("end-msg").innerText = `最終得分：${score} 分！\n準備接收 💩 大爆發！`;
-    if (isNewPB) document.getElementById("leaderboard-title").innerText = "🏆 新紀錄爆發！";
+    document.getElementById("end-msg").innerText = `最終得分：${score} 分！\n可愛 💩 大放送！`;
+    if (isNewPB) document.getElementById("leaderboard-title").innerText = "🏆 新紀錄！";
 
     leaderboard.push({ name, score, isNewRecord: isNewPB });
     leaderboard.sort((a, b) => b.score - a.score);
@@ -197,21 +232,18 @@
     localStorage.setItem("mathGameLeaderboard", JSON.stringify(leaderboard));
     
     updateLeaderboardView(name, score);
-    
-    // 加少少延遲，等畫面 Load 好再噴
-    setTimeout(() => { launchPooCelebration(score, isNewPB); }, 300);
+    setTimeout(() => { launchCutePooCelebration(score, isNewPB); }, 300);
   }
 
-  function launchPooCelebration(totalScore, isNewPB) {
-    if (totalScore <= 0) return; // 0分無屎派
+  function launchCutePooCelebration(totalScore, isNewPB) {
+    if (totalScore <= 0) return; 
 
-    // 安全檢查並載入💩形狀
+    // scalar 改做 1.2，令到 poo poo 變成細小可愛版
     let pooShape;
     if (typeof confetti.shapeFromText === 'function') {
-      pooShape = confetti.shapeFromText({ text: '💩', scalar: 2.5 });
+      pooShape = confetti.shapeFromText({ text: '💩', scalar: 1.2 }); 
     }
 
-    // 分 10 波發射，確保手機唔會被 1000 粒屎搞到當機
     const totalBursts = 10;
     const countPerBurst = Math.floor(totalScore / totalBursts);
     const remainder = totalScore % totalBursts;
@@ -224,21 +256,19 @@
       }
 
       let particlesThisBurst = countPerBurst;
-      // 最後一波將剩餘嘅數量全部補齊，一粒都不能少！
-      if (currentBurst === totalBursts - 1) {
-        particlesThisBurst += remainder; 
-      }
+      if (currentBurst === totalBursts - 1) particlesThisBurst += remainder; 
 
       if (particlesThisBurst > 0) {
         const options = {
           particleCount: particlesThisBurst,
           spread: isNewPB ? 160 : 80,
           origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
-          gravity: 0.8,
-          ticks: 250, // 粒子停留時間
-          startVelocity: 35 + Math.random() * 15 // 增加噴發動態感
+          gravity: 0.6, // 跌得慢少少，感覺輕盈啲
+          ticks: 250, 
+          startVelocity: 30 + Math.random() * 10 
         };
 
+        // 確保只係噴 💩，無其他預設形狀
         if (pooShape) {
           options.shapes = [pooShape];
         }
@@ -246,7 +276,7 @@
         confetti(options);
       }
       currentBurst++;
-    }, 350); // 每 0.35 秒爆一波
+    }, 350); 
   }
 
   function updateLeaderboardView(currentPlayerName, currentScore) {
