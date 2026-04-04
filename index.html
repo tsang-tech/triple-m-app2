@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>20以內數學挑戰 - 💩 Combo 進化版</title>
+<title>20以內數學挑戰 - 💩 終極爆發版</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <style>
   body { 
@@ -14,7 +14,7 @@
   #app { 
     max-width: 400px; margin: 0 auto; background: white; 
     padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-    min-height: 450px;
+    min-height: 500px; position: relative;
   }
   .screen { display: none; }
   .active { display: block; }
@@ -41,26 +41,25 @@
     box-shadow: 0 5px 0 #eee; transition: 0.1s;
   }
   .option-btn:active { transform: translateY(3px); box-shadow: none; }
+  .option-btn:disabled { opacity: 0.5; }
 
   .btn-primary { 
     font-size: 1.2rem; padding: 15px; background-color: #4CAF50; 
     color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 15px; font-family: sans-serif;
   }
-  #leaderboard-list { list-style: none; padding: 0; text-align: left; font-family: sans-serif; }
+  #leaderboard-list { list-style: none; padding: 0; text-align: left; font-family: sans-serif; max-height: 250px; overflow-y: auto; }
   #leaderboard-list li { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px dotted #ccc; align-items: center;}
   .record-tag { font-size: 0.8rem; background-color: #ff9800; color: white; padding: 2px 6px; border-radius: 4px; margin-left: 5px;}
 
-  #end-poo { display: none; font-size: 5rem; margin: 10px auto; }
-  .show-end-poo { display: block !important; animation: poo-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-  @keyframes poo-pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+  #end-poo { font-size: 5rem; margin: 10px auto; display: none; }
 </style>
 </head>
 <body>
 
 <div id="app">
   <div id="start-screen" class="screen active">
-    <h1 style="font-family:sans-serif;">💩 數學 Combo 大爆發</h1>
-    <p style="font-family:sans-serif;">快手答題攞滿分！連對獎勵加倍！<br>最終 💩 數量由你嘅總分話事！</p>
+    <h1 style="font-family:sans-serif;">💩 數學 Combo 噴發</h1>
+    <p style="font-family:sans-serif;">大數永遠喺上面！<br>分數越高，爆出嘅 💩 越多！</p>
     <input type="text" id="player-name" placeholder="輸入名字" maxlength="10" style="font-size:1.5rem; padding:10px; width:80%; margin-bottom:10px; border-radius:8px; border:2px solid #ddd;">
     <button class="btn-primary" onclick="startGame()">開始 60秒 挑戰</button>
   </div>
@@ -86,9 +85,9 @@
   </div>
 
   <div id="leaderboard-screen" class="screen">
-    <div id="end-poo">💩✨</div>
-    <h1 id="end-title" style="font-family:sans-serif; margin:5px 0;">龍虎榜</h1>
-    <p id="end-msg" style="font-size:1.1rem; font-family:sans-serif; white-space: pre-wrap; margin:10px 0;"></p>
+    <div id="end-poo">💩</div>
+    <h1 style="font-family:sans-serif; margin:5px 0;">🏆 龍虎榜</h1>
+    <p id="end-msg" style="font-size:1.1rem; font-family:sans-serif; white-space: pre-wrap; margin:10px 0; color: #795548; font-weight: bold;"></p>
     <ul id="leaderboard-list"></ul>
     <button class="btn-primary" onclick="location.reload()">再玩一次</button>
   </div>
@@ -112,17 +111,27 @@
     showScreen("game-screen");
     generateQuestion();
     
+    // 核心計時器：更嚴謹的結束判斷
     timerInterval = setInterval(() => {
-      if (timeLeft > 0) {
-        timeLeft--;
+      timeLeft--;
+      if (timeLeft <= 0) {
+        timeLeft = 0;
+        document.getElementById("time").innerText = "0";
+        stopGame(name);
+      } else {
         document.getElementById("time").innerText = timeLeft;
       }
-      if (timeLeft <= 0 && gameActive) {
-        gameActive = false;
-        clearInterval(timerInterval);
-        endGame(name);
-      }
     }, 1000);
+  }
+
+  function stopGame(name) {
+    gameActive = false;
+    clearInterval(timerInterval);
+    // 即刻鎖死按鈕防止再撳
+    document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+    
+    // 延遲 300ms 進入結算，畀最後一題 Feedback 完
+    setTimeout(() => endGame(name), 300);
   }
 
   function generateQuestion() {
@@ -131,7 +140,7 @@
     let a = Math.floor(Math.random() * 21);
     let b = Math.floor(Math.random() * 21);
     
-    // 確保大數永遠喺上面
+    // 永遠大數在上面
     let n1 = Math.max(a, b);
     let n2 = Math.min(a, b);
     
@@ -187,7 +196,7 @@
     } else {
       combo = 0;
       score = Math.max(0, score - 5);
-      feedbackEl.innerText = "答錯! Combo 中斷";
+      feedbackEl.innerText = "答錯了! Combo 中斷";
       feedbackEl.style.color = "#f44336";
       btn.style.backgroundColor = "#ffcdd2";
     }
@@ -196,14 +205,13 @@
     void feedbackEl.offsetWidth; 
     feedbackEl.classList.add("show-feedback");
     
-    // 鎖定一陣再下一題
     document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
     setTimeout(() => {
       if(gameActive) {
         document.querySelectorAll('.option-btn').forEach(b => b.disabled = false);
         generateQuestion();
       }
-    }, 400); 
+    }, 350); 
   }
 
   function updateStats() {
@@ -212,44 +220,43 @@
   }
 
   function endGame(name) {
-    // 1. 先切換畫面，確保唔會卡死喺遊戲頁
     showScreen("leaderboard-screen");
+    document.getElementById("end-poo").style.display = "block";
     
     let personalBest = 0;
     leaderboard.forEach(e => { if(e.name === name && e.score > personalBest) personalBest = e.score; });
     let isNewPB = score > personalBest;
 
-    document.getElementById("end-poo").classList.add("show-end-poo");
-    document.getElementById("end-msg").innerText = `總分：${score} 分！\n爆出 ${score} 粒細細個 💩！`;
+    document.getElementById("end-msg").innerText = `最終分數：${score} \n💩 噴發強度：${score}!`;
 
-    // 2. 儲存紀錄
     leaderboard.push({ name, score, isNewRecord: isNewPB });
     leaderboard.sort((a, b) => b.score - a.score);
-    leaderboard = leaderboard.slice(0, 10);
+    leaderboard = leaderboard.slice(0, 15);
     localStorage.setItem("mathGameLeaderboard", JSON.stringify(leaderboard));
     
-    // 3. 更新排行榜列表
     updateLeaderboardView(name, score);
-
-    // 4. 最後慢慢放 💩，唔會卡住個畫面
-    setTimeout(() => { launchPooConfetti(score); }, 300);
+    
+    // 根據總分放 💩
+    launchPooConfetti(score);
   }
 
   function launchPooConfetti(totalScore) {
     const pooEmoji = confetti.shapeFromText({ text: '💩', scalar: 2 });
-    const duration = 4 * 1000;
+    const duration = 5 * 1000;
     const end = Date.now() + duration;
-    const intensity = 5 + Math.min(Math.floor(totalScore / 50) * 5, 40);
+    
+    // 分數越高，粒數越多 (intensity)
+    const intensity = 3 + Math.min(Math.floor(totalScore / 50), 30);
 
     (function frame() {
       confetti({
         particleCount: intensity,
-        angle: 60, spread: 60, origin: { x: 0 },
+        angle: 60, spread: 70, origin: { x: 0 },
         shapes: [pooEmoji], scalar: 0.6
       });
       confetti({
         particleCount: intensity,
-        angle: 120, spread: 60, origin: { x: 1 },
+        angle: 120, spread: 70, origin: { x: 1 },
         shapes: [pooEmoji], scalar: 0.6
       });
       if (Date.now() < end) requestAnimationFrame(frame);
@@ -261,8 +268,8 @@
     list.innerHTML = "";
     leaderboard.forEach((entry, index) => {
       const li = document.createElement("li");
-      let medal = (index === 0) ? '👑 ' : (index + 1) + '. ';
-      let pbTag = (entry.isNewRecord && entry.name === currentPlayerName && entry.score === currentScore) ? '<span class="record-tag">個人 PB</span>' : '';
+      let medal = (index === 0) ? '🥇 ' : (index === 1 ? '🥈 ' : (index === 2 ? '🥉 ' : (index + 1) + '. '));
+      let pbTag = (entry.isNewRecord && entry.name === currentPlayerName && entry.score === currentScore) ? '<span class="record-tag">NEW</span>' : '';
       li.innerHTML = `<span>${medal}${entry.name}${pbTag}</span><span style="color:#1976d2; font-weight:bold;">${entry.score} pts</span>`;
       list.appendChild(li);
     });
