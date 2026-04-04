@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>20以內數學挑戰 - 1分鐘競技版</title>
+<title>20以內數學挑戰 - 煙花臭腳獎勵版</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <style>
   body { 
@@ -18,6 +18,7 @@
   .screen { display: none; }
   .active { display: block; }
   
+  /* 鼓勵字句動畫 */
   #feedback { 
     height: 30px; font-size: 1.5rem; font-weight: bold; margin: 10px 0;
     transition: all 0.2s; opacity: 0;
@@ -27,6 +28,7 @@
   .stats { display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: bold; }
   #question { font-size: 4rem; font-weight: bold; margin: 15px 0; color: #333; }
   
+  /* 選擇按鈕 */
   .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
   .option-btn { 
     font-size: 2.5rem; padding: 25px; background-color: #fff; 
@@ -40,7 +42,24 @@
     color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 15px;
   }
   #leaderboard-list { list-style: none; padding: 0; text-align: left; }
-  #leaderboard-list li { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px dotted #ccc; }
+  #leaderboard-list li { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px dotted #ccc; align-items: center;}
+  .record-tag { font-size: 0.8rem; background-color: #ff9800; color: white; padding: 2px 6px; border-radius: 4px; margin-left: 5px; font-weight: normal;}
+
+  /* 結局大臭腳動畫 */
+  #end-foot {
+    display: none;
+    font-size: 6rem;
+    margin: 10px auto;
+  }
+  @keyframes foot-pop {
+    0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+    60% { transform: scale(1.2) rotate(15deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  .show-end-foot {
+    display: block !important;
+    animation: foot-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
 </style>
 </head>
 <body>
@@ -65,14 +84,15 @@
   </div>
 
   <div id="leaderboard-screen" class="screen">
+    <div id="end-foot">🦶💨</div>
     <h1 id="end-title">🏆 龍虎榜</h1>
+    <p id="end-msg" style="font-size:1.2rem; font-weight:bold;"></p>
     <ul id="leaderboard-list"></ul>
     <button class="btn-primary" onclick="location.reload()">再玩一次</button>
   </div>
 </div>
 
 <script>
-  // 修改時間為 60 秒
   let score = 0, timeLeft = 60, timerInterval, correctAnswer;
   let leaderboard = JSON.parse(localStorage.getItem("mathGameLeaderboard")) || [];
   
@@ -86,9 +106,8 @@
 
   function startGame() {
     let name = document.getElementById("player-name").value.trim();
-    if (!name) return alert("請輸入名字！");
-    score = 0; 
-    timeLeft = 60; // 確保重開時也是 60 秒
+    if (!name) return alert("話我知你叫咩名先！");
+    score = 0; timeLeft = 60;
     updateStats();
     showScreen("game-screen");
     generateQuestion();
@@ -118,7 +137,7 @@
   function displayOptions() {
     let opts = [correctAnswer];
     while (opts.length < 4) {
-      let offset = Math.floor(Math.random() * 9) - 4;
+      let offset = Math.floor(Math.random() * 9) - 4; // -4 to +4
       let wrong = correctAnswer + offset;
       if (wrong >= 0 && !opts.includes(wrong)) opts.push(wrong);
     }
@@ -152,50 +171,92 @@
     }
     
     updateStats();
-    void feedbackEl.offsetWidth; // 強制重繪動畫
+    // 強制重繪以觸發動畫
+    void feedbackEl.offsetWidth; 
     feedbackEl.classList.add("show-feedback");
-    setTimeout(generateQuestion, 200);
+    
+    setTimeout(generateQuestion, 200); 
   }
 
   function updateStats() {
     document.getElementById("score").innerText = score;
-    document.getElementById("time").innerText = timeLeft;
   }
 
   function endGame(name) {
     clearInterval(timerInterval);
-    let isNewRecord = leaderboard.length === 0 || score > leaderboard[0].score;
-    if (isNewRecord && score > 0) {
+    
+    let personalBest = 0;
+    leaderboard.forEach(entry => {
+      if (entry.name === name && entry.score > personalBest) {
+        personalBest = entry.score;
+      }
+    });
+
+    let isNewPersonalRecord = score > personalBest;
+    let endTitle = document.getElementById("end-title");
+    let endMsg = document.getElementById("end-msg");
+    let endFoot = document.getElementById("end-foot");
+
+    // 重置大臭腳狀態
+    endFoot.classList.remove("show-end-foot");
+
+    if (isNewPersonalRecord && score > 0) {
+      // 放煙花 + 出現大臭腳
       launchFireworks();
-      document.getElementById("end-title").innerText = "🎊 新紀錄誕生！ 🎊";
+      endFoot.classList.add("show-end-foot");
+      
+      endTitle.innerText = "🎊 恭喜破紀錄！ 🎊";
+      endMsg.innerText = `獎勵你一隻大臭腳！🦶💨`;
+      endMsg.style.color = "#4CAF50";
     } else {
-      document.getElementById("end-title").innerText = "🏆 龍虎榜";
+      endTitle.innerText = "🏆 龍虎榜";
+      endMsg.innerText = `${name}，再接再厲！`;
+      endMsg.style.color = "#333";
     }
-    leaderboard.push({ name, score });
+
+    leaderboard.push({ name, score, isNewRecord: isNewPersonalRecord });
     leaderboard.sort((a, b) => b.score - a.score);
     leaderboard = leaderboard.slice(0, 10);
     localStorage.setItem("mathGameLeaderboard", JSON.stringify(leaderboard));
-    showLeaderboardOnly();
+    
+    showLeaderboardOnly(name, score);
   }
 
   function launchFireworks() {
-    var duration = 3 * 1000;
+    var duration = 4 * 1000;
     var end = Date.now() + duration;
+
     (function frame() {
-      confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff0000', '#ffae00'] });
-      confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#00ff00', '#0000ff'] });
+      confetti({ particleCount: 5, angle: 60, spread: 70, origin: { x: 0 }, colors: ['#ff0000', '#ffae00', '#4CAF50'] });
+      confetti({ particleCount: 5, angle: 120, spread: 70, origin: { x: 1 }, colors: ['#00ff00', '#0000ff', '#9c27b0'] });
       if (Date.now() < end) requestAnimationFrame(frame);
     }());
   }
 
-  function showLeaderboardOnly() {
+  function showLeaderboardOnly(currentPlayerName, currentScore) {
     showScreen("leaderboard-screen");
     const list = document.getElementById("leaderboard-list");
-    list.innerHTML = leaderboard.map((e, i) => `
-      <li>
-        <span>${i === 0 ? '👑 ' : (i + 1) + '. '}${e.name}</span>
-        <span style="font-weight:bold; color:#1976d2">${e.score} pts</span>
-      </li>`).join("");
+    list.innerHTML = "";
+
+    leaderboard.forEach((entry, index) => {
+      const li = document.createElement("li");
+      const nameSpan = document.createElement("span");
+      let medal = (index === 0) ? '👑 ' : (index + 1) + '. ';
+      nameSpan.innerHTML = `${medal}${entry.name}`;
+      
+      if (entry.isNewRecord && entry.name === currentPlayerName && entry.score === currentScore) {
+         nameSpan.innerHTML += '<span class="record-tag">個人 PB</span>';
+      }
+
+      const scoreSpan = document.createElement("span");
+      scoreSpan.style.fontWeight = "bold";
+      scoreSpan.style.color = "#1976d2";
+      scoreSpan.innerText = `${entry.score} pts`;
+
+      li.appendChild(nameSpan);
+      li.appendChild(scoreSpan);
+      list.appendChild(li);
+    });
   }
 </script>
 </body>
