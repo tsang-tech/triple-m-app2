@@ -3,95 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>20以內加減法挑戰 - 選擇題版</title>
+<title>20以內數學挑戰 - 1分鐘競技版</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <style>
   body { 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-    text-align: center; 
-    background-color: #f0f8ff; 
-    margin: 0; padding: 20px; 
-    touch-action: manipulation; 
+    text-align: center; background-color: #f0f8ff; 
+    margin: 0; padding: 20px; touch-action: manipulation; overflow-x: hidden;
   }
   #app { 
     max-width: 400px; margin: 0 auto; background: white; 
-    padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+    padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
   }
   .screen { display: none; }
   .active { display: block; }
   
-  /* 按鈕樣式 */
-  .btn-primary { 
-    font-size: 1.2rem; padding: 12px 30px; background-color: #4CAF50; 
-    color: white; border: none; border-radius: 8px; cursor: pointer; 
-    font-weight: bold; width: 80%; margin: 10px 0;
+  #feedback { 
+    height: 30px; font-size: 1.5rem; font-weight: bold; margin: 10px 0;
+    transition: all 0.2s; opacity: 0;
   }
+  .show-feedback { opacity: 1 !important; transform: scale(1.1); }
 
-  /* 遊戲介面 */
-  .stats { display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; }
-  #question { font-size: 3.5rem; font-weight: bold; margin: 20px 0; color: #222; }
+  .stats { display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: bold; }
+  #question { font-size: 4rem; font-weight: bold; margin: 15px 0; color: #333; }
   
-  /* 選擇題按鈕網格 */
-  .options-grid { 
-    display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; 
-  }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
   .option-btn { 
-    font-size: 2rem; padding: 20px; background-color: #fff; 
-    border: 3px solid #e0e0e0; border-radius: 12px; cursor: pointer;
-    transition: all 0.2s;
+    font-size: 2.5rem; padding: 25px; background-color: #fff; 
+    border: 3px solid #e0e0e0; border-radius: 15px; cursor: pointer;
+    box-shadow: 0 5px 0 #eee; transition: 0.1s;
   }
-  .option-btn.selected { 
-    background-color: #e3f2fd; border-color: #2196f3; transform: scale(1.05); 
-  }
+  .option-btn:active { transform: translateY(3px); box-shadow: none; }
 
-  /* 確定按鈕 */
-  .confirm-container { margin-top: 25px; }
-  .btn-confirm { 
-    font-size: 2.5rem; width: 100%; padding: 15px; 
-    background-color: #ff9800; color: white; border: none; 
-    border-radius: 12px; cursor: pointer; box-shadow: 0 4px 0 #e68a00;
+  .btn-primary { 
+    font-size: 1.2rem; padding: 15px; background-color: #4CAF50; 
+    color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 15px;
   }
-  .btn-confirm:active { transform: translateY(4px); box-shadow: none; }
-
-  /* 龍虎榜 */
-  #leaderboard-list { list-style: none; padding: 0; font-size: 1.2rem; text-align: left; }
-  #leaderboard-list li { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+  #leaderboard-list { list-style: none; padding: 0; text-align: left; }
+  #leaderboard-list li { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px dotted #ccc; }
 </style>
 </head>
 <body>
 
 <div id="app">
   <div id="start-screen" class="screen active">
-    <h1>🚀 數學挑戰 (選擇題)</h1>
-    <input type="text" id="player-name" placeholder="輸入你的大名" maxlength="10" style="font-size:1.5rem; padding:10px; width:80%; margin-bottom:20px;">
-    <button class="btn-primary" onclick="startGame()">開始遊戲</button>
+    <h1>🧮 數學大激鬥 (1分鐘)</h1>
+    <p>答啱 +1 / 答錯 -1</p>
+    <input type="text" id="player-name" placeholder="輸入名字" maxlength="10" style="font-size:1.5rem; padding:10px; width:80%; margin-bottom:10px; border-radius:8px; border:2px solid #ddd;">
+    <button class="btn-primary" onclick="startGame()">開始 60秒 挑戰</button>
     <button class="btn-primary" style="background-color: #9c27b0;" onclick="showLeaderboardOnly()">龍虎榜</button>
   </div>
 
   <div id="game-screen" class="screen">
     <div class="stats">
-      <div style="color:#d32f2f">⏱ <span id="time">30</span>s</div>
+      <div style="color:#d32f2f">⏱ <span id="time">60</span>s</div>
       <div style="color:#1976d2">⭐ <span id="score">0</span></div>
     </div>
-    <div id="question">-- + -- =</div>
-    
-    <div class="options-grid" id="options-container">
-      </div>
-
-    <div class="confirm-container">
-      <button class="btn-confirm" onclick="submitAnswer()">✔ 確定</button>
-    </div>
+    <div id="feedback"></div>
+    <div id="question">-- + --</div>
+    <div class="options-grid" id="options-container"></div>
   </div>
 
   <div id="leaderboard-screen" class="screen">
-    <h1>🏆 龍虎榜</h1>
+    <h1 id="end-title">🏆 龍虎榜</h1>
     <ul id="leaderboard-list"></ul>
-    <button class="btn-primary" onclick="location.reload()">返回主頁</button>
+    <button class="btn-primary" onclick="location.reload()">再玩一次</button>
   </div>
 </div>
 
 <script>
-  let score = 0, timeLeft = 30, timerInterval, correctAnswer, selectedAnswer = null;
+  // 修改時間為 60 秒
+  let score = 0, timeLeft = 60, timerInterval, correctAnswer;
   let leaderboard = JSON.parse(localStorage.getItem("mathGameLeaderboard")) || [];
+  
+  const posWords = ["Wonderful!", "Superb!", "Well Done!", "Awesome!", "Perfect!"];
+  const negWords = ["Keep Trying!", "Don't Give Up!", "Almost!", "Try Again!", "Focus!"];
 
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -101,9 +87,9 @@
   function startGame() {
     let name = document.getElementById("player-name").value.trim();
     if (!name) return alert("請輸入名字！");
-    
-    score = 0; timeLeft = 30;
-    document.getElementById("score").innerText = score;
+    score = 0; 
+    timeLeft = 60; // 確保重開時也是 60 秒
+    updateStats();
     showScreen("game-screen");
     generateQuestion();
     
@@ -118,65 +104,73 @@
     let isAdd = Math.random() > 0.5;
     let n1 = Math.floor(Math.random() * 21);
     let n2 = Math.floor(Math.random() * 21);
-    
     if (isAdd) {
       correctAnswer = n1 + n2;
-      document.getElementById("question").innerText = `${n1} + ${n2} =`;
+      document.getElementById("question").innerText = `${n1} + ${n2}`;
     } else {
-      if (n1 < n2) [n1, n2] = [n2, n1]; // 確保大減細
+      if (n1 < n2) [n1, n2] = [n2, n1];
       correctAnswer = n1 - n2;
-      document.getElementById("question").innerText = `${n1} - ${n2} =`;
+      document.getElementById("question").innerText = `${n1} - ${n2}`;
     }
-
-    selectedAnswer = null;
     displayOptions();
   }
 
   function displayOptions() {
-    let options = [correctAnswer];
-    // 生成三個不重複的干擾項
-    while (options.length < 4) {
-      let offset = Math.floor(Math.random() * 7) - 3; // 正負3之內
+    let opts = [correctAnswer];
+    while (opts.length < 4) {
+      let offset = Math.floor(Math.random() * 9) - 4;
       let wrong = correctAnswer + offset;
-      if (wrong >= 0 && !options.includes(wrong)) {
-        options.push(wrong);
-      }
+      if (wrong >= 0 && !opts.includes(wrong)) opts.push(wrong);
     }
-    // 隨機打亂順序
-    options.sort(() => Math.random() - 0.5);
+    opts.sort(() => Math.random() - 0.5);
 
     const container = document.getElementById("options-container");
     container.innerHTML = "";
-    options.forEach(opt => {
+    opts.forEach(opt => {
       const btn = document.createElement("button");
       btn.className = "option-btn";
       btn.innerText = opt;
-      btn.onclick = () => {
-        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedAnswer = opt;
-      };
+      btn.onclick = () => checkAnswer(opt, btn);
       container.appendChild(btn);
     });
   }
 
-  function submitAnswer() {
-    if (selectedAnswer === null) return;
+  function checkAnswer(selected, btn) {
+    const feedbackEl = document.getElementById("feedback");
+    feedbackEl.classList.remove("show-feedback");
     
-    if (selectedAnswer === correctAnswer) {
+    if (selected === correctAnswer) {
       score++;
-      document.getElementById("score").innerText = score;
-      generateQuestion();
+      feedbackEl.innerText = posWords[Math.floor(Math.random() * posWords.length)];
+      feedbackEl.style.color = "#4CAF50";
+      btn.style.backgroundColor = "#c8e6c9";
     } else {
-      // 答錯閃紅提示
-      document.querySelector('.selected').style.backgroundColor = "#ffcdd2";
-      setTimeout(generateQuestion, 200);
+      score = Math.max(0, score - 1);
+      feedbackEl.innerText = negWords[Math.floor(Math.random() * negWords.length)];
+      feedbackEl.style.color = "#f44336";
+      btn.style.backgroundColor = "#ffcdd2";
     }
+    
+    updateStats();
+    void feedbackEl.offsetWidth; // 強制重繪動畫
+    feedbackEl.classList.add("show-feedback");
+    setTimeout(generateQuestion, 200);
+  }
+
+  function updateStats() {
+    document.getElementById("score").innerText = score;
+    document.getElementById("time").innerText = timeLeft;
   }
 
   function endGame(name) {
     clearInterval(timerInterval);
-    alert(`遊戲結束！${name} 答對了 ${score} 題！`);
+    let isNewRecord = leaderboard.length === 0 || score > leaderboard[0].score;
+    if (isNewRecord && score > 0) {
+      launchFireworks();
+      document.getElementById("end-title").innerText = "🎊 新紀錄誕生！ 🎊";
+    } else {
+      document.getElementById("end-title").innerText = "🏆 龍虎榜";
+    }
     leaderboard.push({ name, score });
     leaderboard.sort((a, b) => b.score - a.score);
     leaderboard = leaderboard.slice(0, 10);
@@ -184,10 +178,24 @@
     showLeaderboardOnly();
   }
 
+  function launchFireworks() {
+    var duration = 3 * 1000;
+    var end = Date.now() + duration;
+    (function frame() {
+      confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff0000', '#ffae00'] });
+      confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#00ff00', '#0000ff'] });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    }());
+  }
+
   function showLeaderboardOnly() {
     showScreen("leaderboard-screen");
     const list = document.getElementById("leaderboard-list");
-    list.innerHTML = leaderboard.map((e, i) => `<li><span>${i+1}. ${e.name}</span> <span>${e.score}分</span></li>`).join("");
+    list.innerHTML = leaderboard.map((e, i) => `
+      <li>
+        <span>${i === 0 ? '👑 ' : (i + 1) + '. '}${e.name}</span>
+        <span style="font-weight:bold; color:#1976d2">${e.score} pts</span>
+      </li>`).join("");
   }
 </script>
 </body>
