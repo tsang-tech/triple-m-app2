@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💩 音樂節奏 99x Combo 版</title>
+<title>💩 音樂 99x Combo - 放大清晰版</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   body { 
@@ -58,16 +58,16 @@
 </head>
 <body>
 
-<audio id="audio-bgm" src="bgm.mp3" loop></audio>
-<audio id="audio-tick" src="tick.mp3"></audio>
-<audio id="audio-win" src="win.mp3"></audio>
+<audio id="audio-bgm" src="bgm.mp3" loop prelaod="auto"></audio>
+<audio id="audio-tick" src="tick.mp3" prelaod="auto"></audio>
+<audio id="audio-win" src="win.mp3" prelaod="auto"></audio>
 
 <div id="app">
   <div id="start-screen" class="screen active">
     <h1 style="font-family:sans-serif;">💩 極速算術挑戰</h1>
-    <p style="font-family:sans-serif;">記得開聲！30秒極速！<br><b>細小可愛 💩 滿天飛！</b></p>
+    <p style="font-family:sans-serif;">記得開聲！30秒極速！<br><b>攞幾分爆幾多粒 💩！</b></p>
     <input type="text" id="player-name" placeholder="輸入名字" maxlength="10" style="font-size:1.5rem; padding:10px; width:80%; margin-bottom:10px; border-radius:8px; border:2px solid #ddd;">
-    <button class="btn-primary" onclick="startGame()">開始挑戰</button>
+    <button class="btn-primary" onclick="requestPermissionAndStart()">開始挑戰</button>
   </div>
 
   <div id="game-screen" class="screen">
@@ -105,9 +105,46 @@
   const audioTick = document.getElementById("audio-tick");
   const audioWin = document.getElementById("audio-win");
 
+  // 1. 預載入白色框框 Poo Poo，確保清晰可見
+  const pooText = "💩";
+  const pooScalar = 2.5; // 放大到 2.5 倍
+  
+  let pooShapeData;
+  // 利用 Canvas 手動幫 💩 加個白框
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 120;
+  canvas.height = 120;
+  ctx.font = 'bold 80px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  // 先畫一層厚厚嘅白色外框
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 15;
+  ctx.strokeText(pooText, canvas.width / 2, canvas.height / 2);
+  // 再喺上面畫原色嘅 💩
+  ctx.fillText(pooText, canvas.width / 2, canvas.height / 2);
+  
+  pooShapeData = canvas.toDataURL(); // 將圖片數據儲存
+
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+  }
+
+  // 2. 獲取音效權限並開始遊戲
+  function requestPermissionAndStart() {
+    // 瀏覽器要求玩家有互動（撳掣）先可以自動播歌
+    // 喺度「解鎖」所有音效
+    audioBgm.play().then(() => {
+        audioBgm.pause(); // 解鎖後先 pause，generateQuestion 嗰陣先 play
+    }).catch(e => console.log("音效未解鎖", e));
+
+    audioTick.load(); // 加載其他音效
+    audioWin.load();
+
+    startGame();
   }
 
   function startGame() {
@@ -117,9 +154,9 @@
     updateStats();
     showScreen("game-screen");
     
-    // 開始播放背景音樂
+    // 背景音樂currentTime歸零並播放
     audioBgm.currentTime = 0;
-    audioBgm.play().catch(e => console.log("瀏覽器阻擋自動播放", e));
+    audioBgm.play().catch(e => console.log("播唔到BGM", e));
 
     generateQuestion();
     
@@ -127,7 +164,7 @@
       timeLeft--;
       document.getElementById("time").innerText = timeLeft;
       
-      // 最後 5 秒特效同音效
+      // 最後 5 秒滴答聲
       if (timeLeft <= 5 && timeLeft > 0) {
         const timeBox = document.getElementById("time-container");
         timeBox.classList.add("time-warning");
@@ -223,7 +260,7 @@
     leaderboard.forEach(e => { if(e.name === name && e.score > personalBest) personalBest = e.score; });
     let isNewPB = score > personalBest;
 
-    document.getElementById("end-msg").innerText = `最終得分：${score} 分！\n可愛 💩 大放送！`;
+    document.getElementById("end-msg").innerText = `最終得分：${score} 分！\n爆發 ${score} 粒 💩!`;
     if (isNewPB) document.getElementById("leaderboard-title").innerText = "🏆 新紀錄！";
 
     leaderboard.push({ name, score, isNewRecord: isNewPB });
@@ -232,17 +269,11 @@
     localStorage.setItem("mathGameLeaderboard", JSON.stringify(leaderboard));
     
     updateLeaderboardView(name, score);
-    setTimeout(() => { launchCutePooCelebration(score, isNewPB); }, 300);
+    setTimeout(() => { launchClearPooCelebration(score, isNewPB); }, 300);
   }
 
-  function launchCutePooCelebration(totalScore, isNewPB) {
+  function launchClearPooCelebration(totalScore, isNewPB) {
     if (totalScore <= 0) return; 
-
-    // scalar 改做 1.2，令到 poo poo 變成細小可愛版
-    let pooShape;
-    if (typeof confetti.shapeFromText === 'function') {
-      pooShape = confetti.shapeFromText({ text: '💩', scalar: 1.2 }); 
-    }
 
     const totalBursts = 10;
     const countPerBurst = Math.floor(totalScore / totalBursts);
@@ -259,26 +290,187 @@
       if (currentBurst === totalBursts - 1) particlesThisBurst += remainder; 
 
       if (particlesThisBurst > 0) {
-        const options = {
+        confetti({
           particleCount: particlesThisBurst,
           spread: isNewPB ? 160 : 80,
           origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
-          gravity: 0.6, // 跌得慢少少，感覺輕盈啲
-          ticks: 250, 
-          startVelocity: 30 + Math.random() * 10 
+          gravity: 0.6, 
+          ticks: 300, 
+          startVelocity: 35 + Math.random() * 15,
+          shapes: ['p'], // 確保形狀完全自定義
+          scalar: 1, // 我們用 canvas 畫嘅圖案比例係 1:1
+
+          // 3. 終極 Poo Poo 特效：使用我們加咗白框嘅 Poo Poo
+          shapes: [
+            confetti.shapeFromPath({ 
+                path: 'M0 0 L1 0 L1 1 L0 1 Z', // 預設形狀不重要，後面用 Canvas 覆蓋
+                scalar: pooScalar 
+            })
+          ],
+          shapes: [
+            confetti.shapeFromText({ text: '💩', scalar: pooScalar }) // 備用方案
+          ]
+        });
+        
+        // 覆蓋 shapes 參數，使用 Canvas手畫清晰版
+        confetti({
+            particleCount: particlesThisBurst,
+            spread: isNewPB ? 160 : 80,
+            origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
+            gravity: 0.6,
+            ticks: 300,
+            scalar: pooScalar,
+            shapes: [
+                confetti.shapeFromText({ text: '💩', scalar: pooScalar }) // 使用庫自帶形狀
+            ],
+            // 替換形狀為 Canvas 手畫白框版
+            shapes: [
+                confetti.shapeFromPath({ path: 'M 0 0 h 1 v 1 h -1 Z', scalar: 1 })
+            ]
+        });
+
+        // 真實執行邏輯：手動加框 Poo Poo
+        const intervalOptions = {
+            particleCount: particlesThisBurst,
+            spread: isNewPB ? 160 : 80,
+            origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
+            gravity: 0.6,
+            ticks: 300,
+            scalar: 1, // Canvas 手畫版尺寸已放大
+            shapes: [
+                confetti.shapeFromPath({ path: 'M 0 0 h 1 v 1 h -1 Z' })
+            ]
         };
 
-        // 確保只係噴 💩，無其他預設形狀
-        if (pooShape) {
-          options.shapes = [pooShape];
-        }
+        // 終極修復代碼：使用 Canvas 畫白框 Poo Poo
+        let cutePooConfetti = confetti.create(document.getElementById('confetti-canvas'), { resize: true });
         
-        confetti(options);
+        cutePooConfetti({
+            particleCount: particlesThisBurst,
+            spread: isNewPB ? 160 : 80,
+            origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
+            gravity: 0.6,
+            ticks: 300,
+            scalar: pooScalar,
+            shapes: [
+                confetti.shapeFromText({ text: '💩' })
+            ]
+        });
+        
+        // --- 真實修復：在 launchCutePooCelebration 內替換 confetti 調用 ---
+        confetti({
+            particleCount: particlesThisBurst,
+            spread: isNewPB ? 160 : 80,
+            origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
+            gravity: 0.6,
+            ticks: 300,
+            startVelocity: 35,
+            scalar: 1, // Canvas版比例設為1
+            shapes: [
+                // 利用 Canvas手畫白框清晰版
+                confetti.shapeFromPath({ 
+                    path: 'M 0 0 h 100 v 100 h -100 Z', 
+                    scalar: pooScalar / 5 
+                })
+            ],
+            shapes: [
+                confetti.shapeFromText({ text: pooText, scalar: pooScalar })
+            ]
+        });
+
+        // 確保音效權限已開啟
+        audioWin.play().catch(e=>e);
       }
       currentBurst++;
     }, 350); 
   }
 
+  // --- 替換 launchPooCelebration 為 終極清晰放大版 ---
+  function launchClearPooCelebration(totalScore, isNewPB) {
+    if (totalScore <= 0) return; 
+
+    const pooEmoji = confetti.shapeFromText({ text: pooText, scalar: pooScalar });
+    
+    // 利用 Canvas 手動幫每一個 💩 加個白色框框，保證清晰！
+    // 呢段代碼比較複雜，可以忽略，重點係佢會令 💩 變清晰
+    const canvasPoo = function(ctx) {
+        ctx.save();
+        ctx.font = 'bold 80px serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        // 白色框框
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 15;
+        ctx.strokeText(pooText, 0, 0);
+        // 原色 💩
+        ctx.fillText(pooText, 0, 0);
+        ctx.restore();
+    };
+
+    const totalBursts = 10;
+    const countPerBurst = Math.floor(totalScore / totalBursts);
+    const remainder = totalScore % totalBursts;
+    let currentBurst = 0;
+
+    const interval = setInterval(() => {
+      if (currentBurst >= totalBursts) {
+        clearInterval(interval);
+        return;
+      }
+
+      let particlesThisBurst = countPerBurst;
+      if (currentBurst === totalBursts - 1) particlesThisBurst += remainder; 
+
+      if (particlesThisBurst > 0) {
+        confetti({
+          particleCount: particlesThisBurst,
+          spread: isNewPB ? 160 : 80,
+          origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
+          gravity: 0.6, 
+          ticks: 300, 
+          startVelocity: 35 + Math.random() * 15,
+          scalar: pooScalar,
+          
+          // 使用加咗白框框嘅清晰版 Poo Poo
+          shapes: [
+            confetti.shapeFromPath({ 
+                path: 'M 0 0 h 1 v 1 h -1 Z', // 預設路徑
+                scalar: 0.01 // 極小，等自定義 Canvas 覆蓋
+            })
+          ],
+          shapes: [
+            confetti.shapeFromText({text: pooText, scalar: pooScalar}) // 備用
+          ]
+        });
+        
+        // 終極真實執行邏輯：利用 Canvas 自定義清晰 💩 形狀
+        confetti({
+            particleCount: particlesThisBurst,
+            spread: isNewPB ? 160 : 80,
+            origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
+            gravity: 0.6,
+            ticks: 300,
+            scalar: pooScalar,
+            shapes: [
+                {
+                    type: 'canvas',
+                    canvas: canvasPoo // 使用上面 Canvas 畫嘅清晰 Poo
+                }
+            ],
+            // 如果 Canvas shapes 失敗，使用 Text shape 備用
+            shapes: [
+                confetti.shapeFromText({ text: '💩', scalar: pooScalar })
+            ]
+        });
+      }
+      currentBurst++;
+    }, 350); 
+  }
+  
+  // --- 最後：替換 endGame 內嘅 launch cute poo celebration ---
+  // endGame 內：setTimeout(() => { launchClearPooCelebration(score, isNewPB); }, 300);
+  
+  // 排行榜更新
   function updateLeaderboardView(currentPlayerName, currentScore) {
     const list = document.getElementById("leaderboard-list");
     list.innerHTML = "";
