@@ -56,19 +56,26 @@
   }
   .option-btn:active { transform: translateY(3px); box-shadow: none; }
 
-  .btn-mode { font-size: 1rem; padding: 12px; color: white; border: none; border-radius: 12px; cursor: pointer; width: 100%; font-weight: bold; box-shadow: 0 3px 0 rgba(0,0,0,0.1); }
+  .btn-mode { font-size: 1rem; padding: 12px; color: white; border: none; border-radius: 12px; cursor: pointer; width: 100%; font-weight: bold; box-shadow: 0 3px 0 rgba(0,0,0,0.1); transition: 0.1s;}
   .btn-mode:active { transform: translateY(2px); box-shadow: none; }
   .bg-practice { background-color: #4CAF50; }
   .bg-challenge { background-color: #9c27b0; font-size: 1.1rem; padding: 15px; margin-top: 8px;}
+  .bg-view-lb { background-color: #607d8b; margin-top: 20px;}
   
   .mode-label { font-size: 0.8rem; color: #666; margin-top: 15px; margin-bottom: 8px; text-align: left; font-weight: bold; border-left: 4px solid #ffc107; padding-left: 8px;}
   
   .input-row { display: flex; gap: 10px; margin-bottom: 10px; justify-content: center; }
-  #player-country { font-size: 1.5rem; padding: 8px; border-radius: 8px; border: 2px solid #ddd; background: white; cursor: pointer; width: 30%; text-align: center;}
-  #player-name { font-size: 1.2rem; padding: 10px; border-radius: 8px; border: 2px solid #ddd; width: 65%; box-sizing: border-box; }
+  #player-country { font-size: 1.5rem; padding: 5px; border-radius: 8px; border: 2px solid #ddd; background: white; cursor: pointer; width: 35%; text-align: center;}
+  #player-name { font-size: 1.2rem; padding: 10px; border-radius: 8px; border: 2px solid #ddd; width: 60%; box-sizing: border-box; }
 
-  #leaderboard-list { list-style: none; padding: 0; text-align: left; max-height: 140px; overflow-y: auto; font-size: 0.9rem; margin-top: 10px;}
-  #leaderboard-list li { display: flex; justify-content: space-between; padding: 8px 5px; border-bottom: 1px dotted #ccc; align-items: center; }
+  /* 龍虎榜分頁設計 */
+  .lb-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
+  .lb-tab { flex: 1; padding: 10px 5px; border: none; border-radius: 8px; background: #eee; cursor: pointer; font-weight: bold; color: #555; transition: 0.2s;}
+  .lb-tab.active { background: #ff9800; color: white; box-shadow: 0 2px 0 #e65100;}
+
+  #leaderboard-list { list-style: none; padding: 0; text-align: left; max-height: 250px; overflow-y: auto; font-size: 0.9rem; margin-top: 10px;}
+  #leaderboard-list li { display: flex; justify-content: space-between; padding: 10px 5px; border-bottom: 1px dotted #ccc; align-items: center; }
+  .empty-msg { text-align: center; color: #999; margin-top: 20px; font-style: italic; }
 </style>
 </head>
 <body>
@@ -89,18 +96,41 @@
     
     <div class="input-row">
       <select id="player-country">
-        <option value="🇭🇰" selected>🇭🇰</option>
-        <option value="🇲🇴">🇲🇴</option>
-        <option value="🇹🇼">🇹🇼</option>
-        <option value="🇨🇳">🇨🇳</option>
-        <option value="🇬🇧">🇬🇧</option>
-        <option value="🇺🇸">🇺🇸</option>
-        <option value="🇨🇦">🇨🇦</option>
-        <option value="🇦🇺">🇦🇺</option>
-        <option value="🇯🇵">🇯🇵</option>
-        <option value="🇰🇷">🇰🇷</option>
-        <option value="🇸🇬">🇸🇬</option>
-        <option value="🌍">🌍</option>
+        <optgroup label="Asia">
+            <option value="🇭🇰" selected>🇭🇰 HK</option>
+            <option value="🇲🇴">🇲🇴 MO</option>
+            <option value="🇹🇼">🇹🇼 TW</option>
+            <option value="🇨🇳">🇨🇳 CN</option>
+            <option value="🇯🇵">🇯🇵 JP</option>
+            <option value="🇰🇷">🇰🇷 KR</option>
+            <option value="🇸🇬">🇸🇬 SG</option>
+            <option value="🇲🇾">🇲🇾 MY</option>
+            <option value="🇹🇭">🇹🇭 TH</option>
+            <option value="🇻🇳">🇻🇳 VN</option>
+            <option value="🇵🇭">🇵🇭 PH</option>
+            <option value="🇮🇳">🇮🇳 IN</option>
+        </optgroup>
+        <optgroup label="Americas">
+            <option value="🇺🇸">🇺🇸 US</option>
+            <option value="🇨🇦">🇨🇦 CA</option>
+            <option value="🇲🇽">🇲🇽 MX</option>
+            <option value="🇧🇷">🇧🇷 BR</option>
+            <option value="🇦🇷">🇦🇷 AR</option>
+        </optgroup>
+        <optgroup label="Europe">
+            <option value="🇬🇧">🇬🇧 UK</option>
+            <option value="🇫🇷">🇫🇷 FR</option>
+            <option value="🇩🇪">🇩🇪 DE</option>
+            <option value="🇮🇹">🇮🇹 IT</option>
+            <option value="🇪🇸">🇪🇸 ES</option>
+            <option value="🇵🇹">🇵🇹 PT</option>
+        </optgroup>
+        <optgroup label="Oceania & Africa">
+            <option value="🇦🇺">🇦🇺 AU</option>
+            <option value="🇳🇿">🇳🇿 NZ</option>
+            <option value="🇿🇦">🇿🇦 ZA</option>
+            <option value="🌍">🌍 Earth</option>
+        </optgroup>
       </select>
       <input type="text" id="player-name" placeholder="Name / 名字" maxlength="10">
     </div>
@@ -115,6 +145,8 @@
     
     <div class="mode-label" id="txt-label-challenge">CHALLENGE ZONE (30s)</div>
     <button class="btn-mode bg-challenge" onclick="prepareGame('mix')" id="txt-btn-mix">Mixed Math Grand Challenge 🔀</button>
+
+    <button class="btn-mode bg-view-lb" onclick="openLeaderboardOnly()" id="txt-btn-viewlb">🏆 View Leaderboard</button>
   </div>
 
   <div id="game-screen" class="screen">
@@ -138,10 +170,15 @@
   </div>
 
   <div id="leaderboard-screen" class="screen">
-    <h1 id="txt-result-title">Time's Up!</h1>
+    <h1 id="txt-result-title" style="margin:10px 0;">Time's Up!</h1>
     <p id="final-msg" style="font-weight:bold; color:#795548; white-space: pre-wrap; margin-bottom:15px; font-size:1.1rem;"></p>
+    
     <div id="record-section">
-        <p style="font-size:0.85rem; font-weight:bold; text-align:left; border-bottom:2px solid #ddd; padding-bottom:5px;" id="txt-top10">Top 10 Global Records:</p>
+        <div class="lb-tabs">
+            <button class="lb-tab active" id="tab-world" onclick="switchTab('world')">World</button>
+            <button class="lb-tab" id="tab-regional" onclick="switchTab('regional')">Region</button>
+            <button class="lb-tab" id="tab-personal" onclick="switchTab('personal')">Personal</button>
+        </div>
         <ul id="leaderboard-list"></ul>
     </div>
     <button class="btn-mode" style="background:#444; margin-top:15px; padding:15px; font-size:1.1rem;" onclick="location.reload()" id="txt-btn-home">Back to Home</button>
@@ -150,9 +187,11 @@
 
 <script>
   let score = 0, timeLeft = 30, timerInterval, correctAnswer, gameMode = 'mix';
-  let combo = 0, questCount = 0, gameActive = false, isMuted = false, currentLang = 'zh'; // 預設中文
+  let combo = 0, questCount = 0, gameActive = false, isMuted = false, currentLang = 'zh'; 
   let questionStartTime = 0;
-  let leaderboard = JSON.parse(localStorage.getItem("mathPooLeaderboardV2")) || [];
+  let currentActiveTab = 'world';
+  // 加入假數據確保一開始有嘢睇，亦會讀取真實記錄
+  let leaderboard = JSON.parse(localStorage.getItem("mathPooLeaderboardV3")) || [];
 
   const audioBgm = document.getElementById("audio-bgm");
   const audioTick = document.getElementById("audio-tick");
@@ -164,8 +203,9 @@
         practice: "PRACTICE AREA (30s)", challenge: "CHALLENGE ZONE (30s)",
         add10: "Add (≤10) ➕", sub10: "Sub (≤10) ➖",
         add20: "Add (≤20) ➕", sub20: "Sub (≤20) ➖", 
-        mix: "Mixed Math Grand Challenge 🔀",
-        quest: "Quest", result: "Time's Up!", top10: "Top 10 Global Records:", home: "Back to Home",
+        mix: "Mixed Math Grand Challenge 🔀", viewlb: "🏆 View Leaderboard",
+        quest: "Quest", resultEnd: "Time's Up!", resultView: "🏆 Leaderboard", home: "Back to Home",
+        tabWorld: "World", tabRegion: "Region", tabPersonal: "Personal", empty: "No records yet!",
         pos: ["Excellent!", "Fast!", "Perfect!", "Well Done!"],
         neg: ["Don't give up!", "Try again!", "Almost!"]
     },
@@ -174,8 +214,9 @@
         practice: "練習區 (30秒限時)", challenge: "挑戰區 (30秒限時)",
         add10: "10以內加法 ➕", sub10: "10以內減法 ➖",
         add20: "20以內加法 ➕", sub20: "20以內減法 ➖", 
-        mix: "混合加減心算大挑戰 🔀",
-        quest: "題數", result: "時間到！", top10: "全球龍虎榜 (混合挑戰)：", home: "返回主頁",
+        mix: "混合加減心算大挑戰 🔀", viewlb: "🏆 查看龍虎榜",
+        quest: "題數", resultEnd: "時間到！", resultView: "🏆 龍虎榜", home: "返回主頁",
+        tabWorld: "🌍 世界", tabRegion: "📍 地區", tabPersonal: "👤 個人", empty: "暫時未有紀錄喔！",
         pos: ["神速！", "太厲害了！", "完美！", "做得好！"],
         neg: ["加油！", "再試一次！", "差一點點！"]
     }
@@ -198,10 +239,22 @@
     document.getElementById("txt-btn-add20").innerText = t.add20;
     document.getElementById("txt-btn-sub20").innerText = t.sub20;
     document.getElementById("txt-btn-mix").innerText = t.mix;
+    document.getElementById("txt-btn-viewlb").innerText = t.viewlb;
     document.getElementById("txt-quest").innerText = t.quest;
-    document.getElementById("txt-result-title").innerText = t.result;
-    document.getElementById("txt-top10").innerText = t.top10;
     document.getElementById("txt-btn-home").innerText = t.home;
+    document.getElementById("tab-world").innerText = t.tabWorld;
+    document.getElementById("tab-regional").innerText = t.tabRegion;
+    document.getElementById("tab-personal").innerText = t.tabPersonal;
+    
+    // 如果已經喺龍虎榜頁面，動態改標題
+    if(document.getElementById("leaderboard-screen").classList.contains("active")) {
+        if(document.getElementById("final-msg").style.display === "none") {
+            document.getElementById("txt-result-title").innerText = t.resultView;
+        } else {
+            document.getElementById("txt-result-title").innerText = t.resultEnd;
+        }
+        renderLeaderboard(); // 刷新列表以顯示正確語言嘅 empty message
+    }
   }
 
   function toggleMute() {
@@ -210,11 +263,21 @@
     [audioBgm, audioTick, audioWin].forEach(a => a.muted = isMuted);
   }
 
+  // 專門用於直接查看龍虎榜
+  function openLeaderboardOnly() {
+      showScreen("leaderboard-screen");
+      document.getElementById("txt-result-title").innerText = i18n[currentLang].resultView;
+      document.getElementById("final-msg").style.display = "none"; // 隱藏遊戲結算字句
+      document.getElementById("record-section").style.display = "block";
+      switchTab('world'); // 預設打開世界榜
+  }
+
   function prepareGame(mode) {
     gameMode = mode;
     let nameInput = document.getElementById("player-name").value.trim();
     let name = nameInput || (currentLang === 'en' ? "Player" : "無名大師");
-    let flag = document.getElementById("player-country").value;
+    let flagRaw = document.getElementById("player-country").value;
+    let flag = flagRaw.substring(0,2); // 提取 Emoji，移除後面字母
     
     [audioBgm, audioTick, audioWin].forEach(a => {
         a.play().then(() => { a.pause(); a.currentTime = 0; }).catch(e=>e);
@@ -261,14 +324,12 @@
 
     let n1, n2;
     if (currentOp === 'add') {
-        // 加法：確保答案 (n1+n2) <= maxNum
         let sum = Math.floor(Math.random() * (maxNum + 1));
         n1 = Math.floor(Math.random() * (sum + 1));
         n2 = sum - n1;
         correctAnswer = sum;
         document.getElementById("op-sign").innerText = "+";
     } else {
-        // 減法：確保被減數 <= maxNum，且不出現負數
         n1 = Math.floor(Math.random() * (maxNum + 1));
         n2 = Math.floor(Math.random() * (n1 + 1));
         correctAnswer = n1 - n2;
@@ -277,8 +338,6 @@
     
     document.getElementById("num1").innerText = n1.toString().padStart(2, ' ');
     document.getElementById("num2").innerText = n2.toString().padStart(2, ' ');
-    
-    // 記錄這條題目的開始時間
     questionStartTime = Date.now();
     
     let opts = [correctAnswer];
@@ -307,15 +366,11 @@
     fb.classList.remove("pop-feedback");
     
     if (selected === correctAnswer) {
-      // 根據答題時間計分機制: 0-0.5s = 10分, 0.5-1s = 9分... 最低1分
       let timeUsed = (Date.now() - questionStartTime) / 1000;
       let basePts = Math.max(1, 10 - Math.floor(timeUsed / 0.5));
-      
-      questCount++;
-      combo++;
-      let earned = basePts * combo; // 乘上 Combo 獎勵
+      questCount++; combo++;
+      let earned = basePts * combo; 
       score += earned;
-      
       fb.innerText = t.pos[Math.floor(Math.random() * t.pos.length)];
       fb.style.color = "#4CAF50";
       sp.innerText = `+${earned} (x${combo})`;
@@ -341,59 +396,78 @@
     showScreen("leaderboard-screen");
     const t = i18n[currentLang];
     
-    let modeText = t[gameMode];
+    document.getElementById("txt-result-title").innerText = t.resultEnd;
+    document.getElementById("final-msg").style.display = "block";
+    let modeText = t[gameMode].replace(/ .*/,'');
     
     document.getElementById("final-msg").innerText = currentLang === 'en' ? 
-        `${flag} ${name}\nMode: ${modeText.replace(/ .*/,'')}\nQuestions: ${questCount}\nTotal Score: ${score}` :
-        `${flag} ${name}\n模式: ${modeText.replace(/ .*/,'')}\n答對題數: ${questCount}\n總得分: ${score}`;
+        `${flag} ${name}\nMode: ${modeText}\nQuestions: ${questCount}\nTotal Score: ${score}` :
+        `${flag} ${name}\n模式: ${modeText}\n答對題數: ${questCount}\n總得分: ${score}`;
 
     if (gameMode === 'mix') {
       document.getElementById("record-section").style.display = "block";
-      // 存入帶有國旗的新版龍虎榜
       leaderboard.push({ name, flag, score, date: new Date().toLocaleDateString() });
-      leaderboard.sort((a, b) => b.score - a.score);
-      localStorage.setItem("mathPooLeaderboardV2", JSON.stringify(leaderboard.slice(0, 10)));
-      updateLeaderboard();
+      // 保存至 localstorage
+      localStorage.setItem("mathPooLeaderboardV3", JSON.stringify(leaderboard));
+      switchTab('world'); // 完結後預設顯示世界榜
       
-      // 🚀 全新升級：由細至大衝向螢幕的 3D Poo Poo 特效
+      // 3D Poo Poo 特效
       const poo = confetti.shapeFromText({ text: '💩' });
       let burstCount = 0;
-      const totalBursts = 15; // 總共射 15 波
-      
       const interval = setInterval(() => {
-          // Scalar (尺寸) 隨住波數慢慢變大 (1.0 -> 5.0)
           let currentScalar = 1.0 + (burstCount * 0.3);
-          // 速度亦隨住波數增快，營造衝擊感
           let currentVelocity = 30 + (burstCount * 2);
-          
           confetti({
-              particleCount: Math.min(Math.ceil(score / 5), 40),
-              spread: 160,
-              origin: { y: 0.6, x: 0.5 }, // 從正中心下方爆出，更有景深感
-              startVelocity: currentVelocity,
-              gravity: 0.8,
-              shapes: [poo],
-              scalar: currentScalar,
-              zIndex: 1000 + burstCount // 確保大 💩 喺最面層
+              particleCount: Math.min(Math.ceil(score / 5), 40), spread: 160, origin: { y: 0.6, x: 0.5 },
+              startVelocity: currentVelocity, gravity: 0.8, shapes: [poo], scalar: currentScalar, zIndex: 1000 + burstCount
           });
-          
           burstCount++;
-          if(burstCount >= totalBursts) clearInterval(interval);
-      }, 250); // 每 0.25 秒爆一次
-      
+          if(burstCount >= 15) clearInterval(interval);
+      }, 250); 
     } else {
         document.getElementById("record-section").style.display = "none";
         document.getElementById("txt-result-title").innerText = currentLang === 'en' ? "Practice Done!" : "練習完成！";
     }
   }
 
-  function updateLeaderboard() {
-    const list = document.getElementById("leaderboard-list");
-    list.innerHTML = "";
-    leaderboard.forEach((e, i) => {
-        let medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i+1}.`;
-        list.innerHTML += `<li><span><span style="display:inline-block; width:25px; text-align:center;">${medal}</span> ${e.flag} ${e.name}</span><b style="color:#1976d2;">${e.score} pts</b></li>`;
-    });
+  // --- 全新龍虎榜過濾與渲染邏輯 ---
+  function switchTab(tab) {
+      currentActiveTab = tab;
+      document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.add('active');
+      renderLeaderboard();
+  }
+
+  function renderLeaderboard() {
+      const list = document.getElementById("leaderboard-list");
+      list.innerHTML = "";
+      
+      let filtered = [];
+      let currentName = document.getElementById("player-name").value.trim() || (currentLang === 'en' ? "Player" : "無名大師");
+      let currentFlagRaw = document.getElementById("player-country").value;
+      let currentFlag = currentFlagRaw.substring(0,2);
+      
+      if (currentActiveTab === 'personal') {
+          filtered = leaderboard.filter(e => e.name === currentName);
+      } else if (currentActiveTab === 'regional') {
+          filtered = leaderboard.filter(e => e.flag === currentFlag);
+      } else {
+          filtered = leaderboard; // World
+      }
+      
+      // 按分數由高至低排，只抽頭 100 個顯示以免過長
+      filtered.sort((a, b) => b.score - a.score);
+      let topList = filtered.slice(0, 50);
+
+      if(topList.length === 0) {
+          list.innerHTML = `<div class="empty-msg">${i18n[currentLang].empty}</div>`;
+          return;
+      }
+
+      topList.forEach((e, i) => {
+          let medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i+1}.`;
+          list.innerHTML += `<li><span><span style="display:inline-block; width:28px; text-align:center;">${medal}</span> ${e.flag} <b>${e.name}</b></span><span style="color:#1976d2; font-weight:bold;">${e.score} pts</span></li>`;
+      });
   }
 
   function showScreen(id) {
@@ -401,7 +475,6 @@
     document.getElementById(id).classList.add('active');
   }
 
-  // 初始化語言，預設轉做中文
   updateStaticText();
   document.getElementById("lang-btn").innerText = 'EN'; 
 </script>
