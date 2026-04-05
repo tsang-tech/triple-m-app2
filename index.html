@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💩 音樂 99x Combo - 放大清晰版</title>
+<title>💩 算術分項挑戰 - 音樂開關版</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   body { 
@@ -14,25 +14,22 @@
   #app { 
     max-width: 400px; margin: 0 auto; background: white; 
     padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-    min-height: 520px; position: relative;
+    min-height: 550px; position: relative;
   }
   .screen { display: none; }
   .active { display: block; }
   
-  #feedback { 
-    height: 35px; font-size: 1.2rem; font-weight: bold; margin: 5px 0;
-    transition: all 0.2s; opacity: 0; font-family: sans-serif;
+  /* 音樂開關按鈕 */
+  #mute-btn {
+    position: absolute; top: 15px; right: 15px;
+    font-size: 1.5rem; background: #eee; border: none;
+    border-radius: 50%; width: 45px; height: 45px; cursor: pointer; z-index: 100;
   }
-  .show-feedback { opacity: 1 !important; transform: scale(1.1); }
 
-  .stats { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: bold; font-family: sans-serif; align-items: center;}
-  
-  /* 計時器跳動特效 */
+  .stats { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: bold; font-family: sans-serif; align-items: center; margin-top: 10px;}
   #time-container { color:#d32f2f; transition: transform 0.1s; display: inline-block; }
-  .time-warning { transform: scale(1.4); font-weight: 900; }
+  .time-warning { transform: scale(1.5); font-weight: 900; }
 
-  .combo-text { color: #ff5722; font-size: 1.2rem; font-weight: bold; margin: 5px 0; font-family: sans-serif; min-height: 1.5rem;}
-  
   .math-container { display: flex; justify-content: center; margin: 15px 0; }
   .vertical-math { font-size: 4.5rem; font-weight: bold; text-align: right; line-height: 1.1; display: inline-block; padding: 10px; }
   .bottom-line { border-bottom: 6px solid #333; display: block; margin-bottom: 10px; }
@@ -45,29 +42,36 @@
     box-shadow: 0 5px 0 #eee; transition: 0.1s;
   }
   .option-btn:active { transform: translateY(3px); box-shadow: none; }
-  .option-btn:disabled { opacity: 0.5; }
 
-  .btn-primary { 
-    font-size: 1.2rem; padding: 15px; background-color: #4CAF50; 
-    color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 15px; font-family: sans-serif;
-  }
-  #leaderboard-list { list-style: none; padding: 0; text-align: left; font-family: sans-serif; max-height: 250px; overflow-y: auto; }
-  #leaderboard-list li { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px dotted #ccc; align-items: center;}
-  .record-tag { font-size: 0.7rem; background-color: #ff9800; color: white; padding: 2px 5px; border-radius: 4px; margin-left: 5px;}
+  .btn-mode { font-size: 1.2rem; padding: 15px; color: white; border: none; border-radius: 12px; cursor: pointer; width: 100%; margin-top: 10px; font-family: sans-serif; font-weight: bold; }
+  .bg-add { background-color: #4CAF50; }
+  .bg-sub { background-color: #2196F3; }
+  
+  #leaderboard-list { list-style: none; padding: 0; text-align: left; font-family: sans-serif; max-height: 200px; overflow-y: auto; font-size: 0.9rem; }
+  #leaderboard-list li { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px dotted #ccc; }
 </style>
 </head>
 <body>
 
-<audio id="audio-bgm" src="bgm.mp3" loop prelaod="auto"></audio>
-<audio id="audio-tick" src="tick.mp3" prelaod="auto"></audio>
-<audio id="audio-win" src="win.mp3" prelaod="auto"></audio>
+<audio id="audio-bgm" src="bgm.mp3" loop></audio>
+<audio id="audio-tick" src="tick.mp3"></audio>
+<audio id="audio-win" src="win.mp3"></audio>
 
 <div id="app">
+  <button id="mute-btn" onclick="toggleMute()">🎵</button>
+
   <div id="start-screen" class="screen active">
-    <h1 style="font-family:sans-serif;">💩 極速算術挑戰</h1>
-    <p style="font-family:sans-serif;">記得開聲！30秒極速！<br><b>攞幾分爆幾多粒 💩！</b></p>
-    <input type="text" id="player-name" placeholder="輸入名字" maxlength="10" style="font-size:1.5rem; padding:10px; width:80%; margin-bottom:10px; border-radius:8px; border:2px solid #ddd;">
-    <button class="btn-primary" onclick="requestPermissionAndStart()">開始挑戰</button>
+    <h1 style="font-family:sans-serif; margin-bottom:5px;">💩 算術大爆發</h1>
+    <p style="font-family:sans-serif; color:#795548;">破紀錄即噴 1000+ 粒 💩</p>
+    
+    <input type="text" id="player-name" placeholder="輸入大名" maxlength="10" style="font-size:1.3rem; padding:10px; width:80%; margin-bottom:15px; border-radius:8px; border:2px solid #ddd;">
+    
+    <button class="btn-mode bg-add" onclick="prepareGame('add')">加法練習 ➕</button>
+    <button class="btn-mode bg-sub" onclick="prepareGame('sub')">減法練習 ➖</button>
+    
+    <div style="margin-top:20px; font-size:0.8rem; color:#999;">
+        *請確保目錄下有 bgm.mp3, tick.mp3, win.mp3
+    </div>
   </div>
 
   <div id="game-screen" class="screen">
@@ -75,8 +79,8 @@
       <div id="time-container">⏱ <span id="time">30</span>s</div>
       <div style="color:#1976d2">⭐ <span id="score">0</span></div>
     </div>
-    <div id="combo-display" class="combo-text">Combo: 0</div>
-    <div id="feedback"></div>
+    <div id="combo-display" style="color:#ff5722; font-weight:bold; margin-top:5px;">Combo: 0</div>
+    
     <div class="math-container">
       <div class="vertical-math">
         <div id="num1">--</div>
@@ -87,400 +91,154 @@
   </div>
 
   <div id="leaderboard-screen" class="screen">
-    <div id="end-poo-icon" style="font-size:5rem; margin:10px 0;">💩</div>
-    <h1 id="leaderboard-title" style="font-family:sans-serif; margin:5px 0;">龍虎榜</h1>
-    <p id="end-msg" style="font-size:1.1rem; font-family:sans-serif; margin:10px 0; color: #795548; font-weight: bold;"></p>
+    <h1 id="result-title" style="margin:10px 0;">🎉 完結！</h1>
+    <p id="final-msg" style="font-weight:bold; color:#795548;"></p>
     <ul id="leaderboard-list"></ul>
-    <button class="btn-primary" onclick="location.reload()">再玩一次</button>
+    <button class="btn-mode bg-add" style="background:#444;" onclick="location.reload()">返回主頁</button>
   </div>
 </div>
 
 <script>
-  let score = 0, timeLeft = 30, timerInterval, correctAnswer;
-  let combo = 0, questionStartTime = 0, gameActive = false;
-  let leaderboard = JSON.parse(localStorage.getItem("mathGameLeaderboard")) || [];
-  
-  // 獲取音效元素
+  let score = 0, timeLeft = 30, timerInterval, correctAnswer, gameMode = 'add';
+  let combo = 0, questionStartTime = 0, isMuted = false;
+  let leaderboard = JSON.parse(localStorage.getItem("mathPooLeaderboard")) || [];
+
   const audioBgm = document.getElementById("audio-bgm");
   const audioTick = document.getElementById("audio-tick");
   const audioWin = document.getElementById("audio-win");
 
-  // 1. 預載入白色框框 Poo Poo，確保清晰可見
-  const pooText = "💩";
-  const pooScalar = 2.5; // 放大到 2.5 倍
-  
-  let pooShapeData;
-  // 利用 Canvas 手動幫 💩 加個白框
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = 120;
-  canvas.height = 120;
-  ctx.font = 'bold 80px serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  
-  // 先畫一層厚厚嘅白色外框
-  ctx.strokeStyle = 'white';
-  ctx.lineWidth = 15;
-  ctx.strokeText(pooText, canvas.width / 2, canvas.height / 2);
-  // 再喺上面畫原色嘅 💩
-  ctx.fillText(pooText, canvas.width / 2, canvas.height / 2);
-  
-  pooShapeData = canvas.toDataURL(); // 將圖片數據儲存
-
-  function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+  function toggleMute() {
+    isMuted = !isMuted;
+    document.getElementById("mute-btn").innerText = isMuted ? "🔇" : "🎵";
+    audioBgm.muted = isMuted;
+    audioTick.muted = isMuted;
+    audioWin.muted = isMuted;
   }
 
-  // 2. 獲取音效權限並開始遊戲
-  function requestPermissionAndStart() {
-    // 瀏覽器要求玩家有互動（撳掣）先可以自動播歌
-    // 喺度「解鎖」所有音效
-    audioBgm.play().then(() => {
-        audioBgm.pause(); // 解鎖後先 pause，generateQuestion 嗰陣先 play
-    }).catch(e => console.log("音效未解鎖", e));
-
-    audioTick.load(); // 加載其他音效
-    audioWin.load();
-
-    startGame();
-  }
-
-  function startGame() {
+  function prepareGame(mode) {
+    gameMode = mode;
     let name = document.getElementById("player-name").value.trim();
-    if (!name) return alert("名都唔入？");
-    score = 0; timeLeft = 30; combo = 0; gameActive = true;
-    updateStats();
-    showScreen("game-screen");
+    if (!name) return alert("請輸入名字先！");
     
-    // 背景音樂currentTime歸零並播放
-    audioBgm.currentTime = 0;
-    audioBgm.play().catch(e => console.log("播唔到BGM", e));
+    // 預熱音效
+    audioBgm.play().then(() => { if(gameActive===false) audioBgm.pause(); }).catch(e=>e);
+    startGame(name);
+  }
 
+  let gameActive = false;
+  function startGame(name) {
+    score = 0; timeLeft = 30; combo = 0; gameActive = true;
+    document.getElementById("score").innerText = "0";
+    document.getElementById("time").innerText = "30";
+    document.getElementById("op-sign").innerText = (gameMode === 'add') ? "+" : "-";
+    
+    showScreen("game-screen");
+    if(!isMuted) { audioBgm.currentTime = 0; audioBgm.play().catch(e=>e); }
+    
     generateQuestion();
     
     timerInterval = setInterval(() => {
       timeLeft--;
       document.getElementById("time").innerText = timeLeft;
       
-      // 最後 5 秒滴答聲
-      if (timeLeft <= 5 && timeLeft > 0) {
-        const timeBox = document.getElementById("time-container");
-        timeBox.classList.add("time-warning");
-        setTimeout(() => timeBox.classList.remove("time-warning"), 200);
-        
+      if (timeLeft <= 5 && timeLeft > 0 && !isMuted) {
+        document.getElementById("time-container").classList.add("time-warning");
+        setTimeout(()=>document.getElementById("time-container").classList.remove("time-warning"), 200);
         audioTick.currentTime = 0;
         audioTick.play().catch(e=>e);
       }
 
       if (timeLeft <= 0) {
-        gameActive = false;
         clearInterval(timerInterval);
+        gameActive = false;
         endGame(name);
       }
     }, 1000);
   }
 
   function generateQuestion() {
-    if (!gameActive) return;
-    let isAdd = Math.random() > 0.5;
     let a = Math.floor(Math.random() * 21), b = Math.floor(Math.random() * 21);
     let n1 = Math.max(a, b), n2 = Math.min(a, b);
     
-    if (isAdd) { correctAnswer = n1 + n2; document.getElementById("op-sign").innerText = "+"; }
-    else { correctAnswer = n1 - n2; document.getElementById("op-sign").innerText = "-"; }
+    if (gameMode === 'add') { correctAnswer = n1 + n2; }
+    else { correctAnswer = n1 - n2; }
     
     document.getElementById("num1").innerText = n1.toString().padStart(2, ' ');
     document.getElementById("num2").innerText = n2.toString().padStart(2, ' ');
     questionStartTime = Date.now();
-    displayOptions();
-  }
-
-  function displayOptions() {
+    
     let opts = [correctAnswer];
     while (opts.length < 4) {
       let wrong = correctAnswer + (Math.floor(Math.random() * 11) - 5);
       if (wrong >= 0 && !opts.includes(wrong)) opts.push(wrong);
     }
     opts.sort(() => Math.random() - 0.5);
+    
     const container = document.getElementById("options-container");
     container.innerHTML = "";
     opts.forEach(opt => {
       const btn = document.createElement("button");
       btn.className = "option-btn";
       btn.innerText = opt;
-      btn.onclick = () => checkAnswer(opt, btn);
+      btn.onclick = () => {
+        if(!gameActive) return;
+        if (opt === correctAnswer) {
+            let bonus = Math.max(1, 10 - Math.floor((Date.now()-questionStartTime)/500));
+            combo++;
+            score += (bonus * Math.min(combo, 99));
+            btn.style.backgroundColor = "#c8e6c9";
+        } else {
+            combo = 0; score = Math.max(0, score - 10);
+            btn.style.backgroundColor = "#ffcdd2";
+        }
+        document.getElementById("score").innerText = score;
+        document.getElementById("combo-display").innerText = `Combo: ${combo}`;
+        setTimeout(generateQuestion, 200);
+      };
       container.appendChild(btn);
     });
   }
 
-  function checkAnswer(selected, btn) {
-    if (!gameActive) return;
-    const feedbackEl = document.getElementById("feedback");
-    feedbackEl.classList.remove("show-feedback");
-    
-    if (selected === correctAnswer) {
-      let timeUsed = (Date.now() - questionStartTime) / 1000;
-      let basePoints = Math.max(1, 10 - Math.floor(timeUsed / 0.5));
-      combo++;
-      let multiplier = Math.min(combo, 99);
-      let earned = basePoints * multiplier;
-      score += earned;
-      feedbackEl.innerText = `+${earned}! (x${multiplier})`;
-      feedbackEl.style.color = "#4CAF50";
-      btn.style.backgroundColor = "#c8e6c9";
-    } else {
-      combo = 0; score = Math.max(0, score - 10);
-      feedbackEl.innerText = "Combo 斷咗!";
-      feedbackEl.style.color = "#f44336";
-      btn.style.backgroundColor = "#ffcdd2";
-    }
-    updateStats();
-    void feedbackEl.offsetWidth; 
-    feedbackEl.classList.add("show-feedback");
-    document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
-    setTimeout(() => { if(gameActive) { document.querySelectorAll('.option-btn').forEach(b => b.disabled = false); generateQuestion(); } }, 250); 
-  }
-
-  function updateStats() {
-    document.getElementById("score").innerText = score;
-    document.getElementById("combo-display").innerText = `Combo: ${combo}`;
-  }
-
   function endGame(name) {
-    // 停背景音樂，播勝利音樂
     audioBgm.pause();
-    audioWin.currentTime = 0;
-    audioWin.play().catch(e=>e);
-
+    if(!isMuted) audioWin.play().catch(e=>e);
+    
     showScreen("leaderboard-screen");
-    
-    let personalBest = 0;
-    leaderboard.forEach(e => { if(e.name === name && e.score > personalBest) personalBest = e.score; });
-    let isNewPB = score > personalBest;
+    document.getElementById("final-msg").innerText = `你喺${gameMode==='add'?'加法':'減法'}攞咗 ${score} 分！\n即刻爆 💩 慶祝！`;
 
-    document.getElementById("end-msg").innerText = `最終得分：${score} 分！\n爆發 ${score} 粒 💩!`;
-    if (isNewPB) document.getElementById("leaderboard-title").innerText = "🏆 新紀錄！";
-
-    leaderboard.push({ name, score, isNewRecord: isNewPB });
+    leaderboard.push({ name, score, mode: gameMode });
     leaderboard.sort((a, b) => b.score - a.score);
-    leaderboard = leaderboard.slice(0, 10);
-    localStorage.setItem("mathGameLeaderboard", JSON.stringify(leaderboard));
+    localStorage.setItem("mathPooLeaderboard", JSON.stringify(leaderboard.slice(0, 10)));
+
+    updateLeaderboard();
     
-    updateLeaderboardView(name, score);
-    setTimeout(() => { launchClearPooCelebration(score, isNewPB); }, 300);
-  }
-
-  function launchClearPooCelebration(totalScore, isNewPB) {
-    if (totalScore <= 0) return; 
-
-    const totalBursts = 10;
-    const countPerBurst = Math.floor(totalScore / totalBursts);
-    const remainder = totalScore % totalBursts;
-    let currentBurst = 0;
-
+    // 放大版 💩 噴發
+    const poo = confetti.shapeFromText({ text: '💩', scalar: 2.5 });
+    let count = 0;
     const interval = setInterval(() => {
-      if (currentBurst >= totalBursts) {
-        clearInterval(interval);
-        return;
-      }
-
-      let particlesThisBurst = countPerBurst;
-      if (currentBurst === totalBursts - 1) particlesThisBurst += remainder; 
-
-      if (particlesThisBurst > 0) {
         confetti({
-          particleCount: particlesThisBurst,
-          spread: isNewPB ? 160 : 80,
-          origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
-          gravity: 0.6, 
-          ticks: 300, 
-          startVelocity: 35 + Math.random() * 15,
-          shapes: ['p'], // 確保形狀完全自定義
-          scalar: 1, // 我們用 canvas 畫嘅圖案比例係 1:1
-
-          // 3. 終極 Poo Poo 特效：使用我們加咗白框嘅 Poo Poo
-          shapes: [
-            confetti.shapeFromPath({ 
-                path: 'M0 0 L1 0 L1 1 L0 1 Z', // 預設形狀不重要，後面用 Canvas 覆蓋
-                scalar: pooScalar 
-            })
-          ],
-          shapes: [
-            confetti.shapeFromText({ text: '💩', scalar: pooScalar }) // 備用方案
-          ]
+            particleCount: Math.ceil(score / 10),
+            spread: 100,
+            origin: { y: 0.6, x: Math.random() },
+            shapes: [poo],
+            scalar: 2.5
         });
-        
-        // 覆蓋 shapes 參數，使用 Canvas手畫清晰版
-        confetti({
-            particleCount: particlesThisBurst,
-            spread: isNewPB ? 160 : 80,
-            origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
-            gravity: 0.6,
-            ticks: 300,
-            scalar: pooScalar,
-            shapes: [
-                confetti.shapeFromText({ text: '💩', scalar: pooScalar }) // 使用庫自帶形狀
-            ],
-            // 替換形狀為 Canvas 手畫白框版
-            shapes: [
-                confetti.shapeFromPath({ path: 'M 0 0 h 1 v 1 h -1 Z', scalar: 1 })
-            ]
-        });
-
-        // 真實執行邏輯：手動加框 Poo Poo
-        const intervalOptions = {
-            particleCount: particlesThisBurst,
-            spread: isNewPB ? 160 : 80,
-            origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
-            gravity: 0.6,
-            ticks: 300,
-            scalar: 1, // Canvas 手畫版尺寸已放大
-            shapes: [
-                confetti.shapeFromPath({ path: 'M 0 0 h 1 v 1 h -1 Z' })
-            ]
-        };
-
-        // 終極修復代碼：使用 Canvas 畫白框 Poo Poo
-        let cutePooConfetti = confetti.create(document.getElementById('confetti-canvas'), { resize: true });
-        
-        cutePooConfetti({
-            particleCount: particlesThisBurst,
-            spread: isNewPB ? 160 : 80,
-            origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
-            gravity: 0.6,
-            ticks: 300,
-            scalar: pooScalar,
-            shapes: [
-                confetti.shapeFromText({ text: '💩' })
-            ]
-        });
-        
-        // --- 真實修復：在 launchCutePooCelebration 內替換 confetti 調用 ---
-        confetti({
-            particleCount: particlesThisBurst,
-            spread: isNewPB ? 160 : 80,
-            origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
-            gravity: 0.6,
-            ticks: 300,
-            startVelocity: 35,
-            scalar: 1, // Canvas版比例設為1
-            shapes: [
-                // 利用 Canvas手畫白框清晰版
-                confetti.shapeFromPath({ 
-                    path: 'M 0 0 h 100 v 100 h -100 Z', 
-                    scalar: pooScalar / 5 
-                })
-            ],
-            shapes: [
-                confetti.shapeFromText({ text: pooText, scalar: pooScalar })
-            ]
-        });
-
-        // 確保音效權限已開啟
-        audioWin.play().catch(e=>e);
-      }
-      currentBurst++;
-    }, 350); 
+        count++;
+        if(count >= 10) clearInterval(interval);
+    }, 300);
   }
 
-  // --- 替換 launchPooCelebration 為 終極清晰放大版 ---
-  function launchClearPooCelebration(totalScore, isNewPB) {
-    if (totalScore <= 0) return; 
-
-    const pooEmoji = confetti.shapeFromText({ text: pooText, scalar: pooScalar });
-    
-    // 利用 Canvas 手動幫每一個 💩 加個白色框框，保證清晰！
-    // 呢段代碼比較複雜，可以忽略，重點係佢會令 💩 變清晰
-    const canvasPoo = function(ctx) {
-        ctx.save();
-        ctx.font = 'bold 80px serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        // 白色框框
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 15;
-        ctx.strokeText(pooText, 0, 0);
-        // 原色 💩
-        ctx.fillText(pooText, 0, 0);
-        ctx.restore();
-    };
-
-    const totalBursts = 10;
-    const countPerBurst = Math.floor(totalScore / totalBursts);
-    const remainder = totalScore % totalBursts;
-    let currentBurst = 0;
-
-    const interval = setInterval(() => {
-      if (currentBurst >= totalBursts) {
-        clearInterval(interval);
-        return;
-      }
-
-      let particlesThisBurst = countPerBurst;
-      if (currentBurst === totalBursts - 1) particlesThisBurst += remainder; 
-
-      if (particlesThisBurst > 0) {
-        confetti({
-          particleCount: particlesThisBurst,
-          spread: isNewPB ? 160 : 80,
-          origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
-          gravity: 0.6, 
-          ticks: 300, 
-          startVelocity: 35 + Math.random() * 15,
-          scalar: pooScalar,
-          
-          // 使用加咗白框框嘅清晰版 Poo Poo
-          shapes: [
-            confetti.shapeFromPath({ 
-                path: 'M 0 0 h 1 v 1 h -1 Z', // 預設路徑
-                scalar: 0.01 // 極小，等自定義 Canvas 覆蓋
-            })
-          ],
-          shapes: [
-            confetti.shapeFromText({text: pooText, scalar: pooScalar}) // 備用
-          ]
-        });
-        
-        // 終極真實執行邏輯：利用 Canvas 自定義清晰 💩 形狀
-        confetti({
-            particleCount: particlesThisBurst,
-            spread: isNewPB ? 160 : 80,
-            origin: isNewPB ? { y: 0.6 } : (currentBurst % 2 === 0 ? { x: 0, y: 0.7 } : { x: 1, y: 0.7 }),
-            gravity: 0.6,
-            ticks: 300,
-            scalar: pooScalar,
-            shapes: [
-                {
-                    type: 'canvas',
-                    canvas: canvasPoo // 使用上面 Canvas 畫嘅清晰 Poo
-                }
-            ],
-            // 如果 Canvas shapes 失敗，使用 Text shape 備用
-            shapes: [
-                confetti.shapeFromText({ text: '💩', scalar: pooScalar })
-            ]
-        });
-      }
-      currentBurst++;
-    }, 350); 
-  }
-  
-  // --- 最後：替換 endGame 內嘅 launch cute poo celebration ---
-  // endGame 內：setTimeout(() => { launchClearPooCelebration(score, isNewPB); }, 300);
-  
-  // 排行榜更新
-  function updateLeaderboardView(currentPlayerName, currentScore) {
+  function updateLeaderboard() {
     const list = document.getElementById("leaderboard-list");
     list.innerHTML = "";
-    leaderboard.forEach((entry, index) => {
-      const li = document.createElement("li");
-      let medal = (index === 0) ? '🥇 ' : (index + 1) + '. ';
-      let pbTag = (entry.isNewRecord && entry.name === currentPlayerName && entry.score === currentScore) ? '<span class="record-tag">NEW</span>' : '';
-      li.innerHTML = `<span>${medal}${entry.name}${pbTag}</span><span style="color:#1976d2; font-weight:bold;">${entry.score} pts</span>`;
-      list.appendChild(li);
+    leaderboard.slice(0, 10).forEach((e, i) => {
+        list.innerHTML += `<li><span>${i+1}. ${e.name} (${e.mode==='add'?'加':'減'})</span><b>${e.score} pts</b></li>`;
     });
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
   }
 </script>
 </body>
