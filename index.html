@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💩 算術練習與挑戰版</title>
+<title>💩 Math Master - 30s Sprint</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   body { 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    font-family: 'Segoe UI', system-ui, sans-serif; 
     text-align: center; background-color: #fff9c4; 
     margin: 0; padding: 20px; touch-action: manipulation; overflow-x: hidden;
   }
@@ -19,15 +19,22 @@
   .screen { display: none; }
   .active { display: block; }
   
-  #mute-btn {
-    position: absolute; top: 15px; right: 15px;
-    font-size: 1.5rem; background: #eee; border: none;
-    border-radius: 50%; width: 45px; height: 45px; cursor: pointer; z-index: 100;
+  /* 右下角控制區 */
+  .controls-footer {
+    position: absolute; bottom: 15px; right: 15px;
+    display: flex; gap: 10px; z-index: 100;
   }
+  .control-btn {
+    font-size: 1.1rem; background: #f8f8f8; border: 2px solid #ddd;
+    border-radius: 12px; width: 50px; height: 50px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-weight: bold;
+    box-shadow: 0 2px 0 #ccc;
+  }
+  .control-btn:active { transform: translateY(2px); box-shadow: none; }
 
-  .stats { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; align-items: center; margin-top: 10px;}
+  .stats { display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: bold; align-items: center; margin-top: 10px;}
   #time-container { color:#d32f2f; }
-  .time-warning { transform: scale(1.3); color: #ff0000 !important; transition: 0.1s; }
+  .time-warning { transform: scale(1.3); color: #ff0000 !important; transition: 0.1s; font-weight: 900; }
 
   #feedback-msg { 
     height: 30px; font-weight: bold; margin: 10px 0; font-size: 1.2rem;
@@ -53,8 +60,7 @@
   .bg-challenge { background-color: #9c27b0; }
   
   .mode-label { font-size: 0.8rem; color: #666; margin-top: 15px; text-align: left; font-weight: bold; border-left: 4px solid #ffc107; padding-left: 8px;}
-  
-  #leaderboard-list { list-style: none; padding: 0; text-align: left; max-height: 150px; overflow-y: auto; font-size: 0.85rem; }
+  #leaderboard-list { list-style: none; padding: 0; text-align: left; max-height: 140px; overflow-y: auto; font-size: 0.85rem; }
   #leaderboard-list li { display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px dotted #ccc; }
 </style>
 </head>
@@ -65,29 +71,32 @@
 <audio id="audio-win" src="win.mp3" preload="auto"></audio>
 
 <div id="app">
-  <button id="mute-btn" onclick="toggleMute()">🎵</button>
+  <div class="controls-footer">
+    <button id="lang-btn" class="control-btn" onclick="toggleLang()">中</button>
+    <button id="mute-btn" class="control-btn" onclick="toggleMute()">🎵</button>
+  </div>
 
   <div id="start-screen" class="screen active">
-    <h1 style="margin-bottom:5px;">💩 Math Mastery</h1>
-    <p style="color:#795548; font-size:0.9rem;">練好加減法，挑戰 💩 爆發！</p>
+    <h1 id="txt-title">💩 Math Mastery</h1>
+    <p id="txt-subtitle" style="color:#795548; font-size:0.9rem;">30 Seconds to burst the Poo!</p>
     
-    <input type="text" id="player-name" placeholder="Enter Your Name" maxlength="10" style="font-size:1.3rem; padding:10px; width:80%; margin-bottom:10px; border-radius:8px; border:2px solid #ddd;">
+    <input type="text" id="player-name" placeholder="Name / 名字" maxlength="10" style="font-size:1.3rem; padding:10px; width:80%; margin-bottom:10px; border-radius:8px; border:2px solid #ddd;">
     
-    <div class="mode-label">PRACTICE AREA (練習區)</div>
-    <button class="btn-mode bg-practice" onclick="prepareGame('add')">Pure Addition ➕</button>
-    <button class="btn-mode bg-practice" onclick="prepareGame('sub')">Pure Subtraction ➖</button>
+    <div class="mode-label" id="txt-label-practice">PRACTICE AREA (30s)</div>
+    <button class="btn-mode bg-practice" onclick="prepareGame('add')" id="txt-btn-add">Pure Addition ➕</button>
+    <button class="btn-mode bg-practice" onclick="prepareGame('sub')" id="txt-btn-sub">Pure Subtraction ➖</button>
     
-    <div class="mode-label">CHALLENGE ZONE (挑戰區)</div>
-    <button class="btn-mode bg-challenge" onclick="prepareGame('mix')">Mixed & 💩 Effects 🔀</button>
+    <div class="mode-label" id="txt-label-challenge">CHALLENGE ZONE (30s)</div>
+    <button class="btn-mode bg-challenge" onclick="prepareGame('mix')" id="txt-btn-mix">Mixed & 💩 Effects 🔀</button>
   </div>
 
   <div id="game-screen" class="screen">
     <div class="stats">
-      <div id="status-left">Quest: <span id="quest-count">0</span></div>
-      <div id="time-container">⏱ <span id="time">--</span>s</div>
+      <div id="status-left"><span id="txt-quest">Quest</span>: <span id="quest-count">0</span></div>
+      <div id="time-container">⏱ <span id="time">30</span>s</div>
       <div style="color:#1976d2">⭐ <span id="score">0</span></div>
     </div>
-    <div id="feedback-msg">Good Luck!</div>
+    <div id="feedback-msg">Ready?</div>
     
     <div class="math-container">
       <div class="vertical-math">
@@ -99,27 +108,66 @@
   </div>
 
   <div id="leaderboard-screen" class="screen">
-    <h1 id="result-title" style="margin:10px 0;">Well Done!</h1>
+    <h1 id="txt-result-title">Time's Up!</h1>
     <p id="final-msg" style="font-weight:bold; color:#795548; white-space: pre-wrap; margin-bottom:15px;"></p>
     <div id="record-section">
-        <p style="font-size:0.8rem; font-weight:bold; text-align:left;">Top 10 Records:</p>
+        <p style="font-size:0.8rem; font-weight:bold; text-align:left;" id="txt-top10">Top 10 Records (Mixed):</p>
         <ul id="leaderboard-list"></ul>
     </div>
-    <button class="btn-mode" style="background:#444;" onclick="location.reload()">Back to Home</button>
+    <button class="btn-mode" style="background:#444;" onclick="location.reload()" id="txt-btn-home">Back to Home</button>
   </div>
 </div>
 
 <script>
   let score = 0, timeLeft = 30, timerInterval, correctAnswer, gameMode = 'mix';
-  let combo = 0, questCount = 0, gameActive = false, isMuted = false;
+  let combo = 0, questCount = 0, gameActive = false, isMuted = false, currentLang = 'en';
   let leaderboard = JSON.parse(localStorage.getItem("mathPooLeaderboard")) || [];
 
   const audioBgm = document.getElementById("audio-bgm");
   const audioTick = document.getElementById("audio-tick");
   const audioWin = document.getElementById("audio-win");
 
-  const positiveFeedback = ["Excellent!", "Amazing!", "Perfect!", "Well Done!", "Great!", "Superb!"];
-  const encourageFeedback = ["Don't give up!", "Try again!", "You can do it!", "Keep going!", "Almost there!"];
+  const i18n = {
+    en: {
+        title: "💩 Math Mastery", subtitle: "30 Seconds to burst the Poo!",
+        practice: "PRACTICE AREA (30s)", challenge: "CHALLENGE ZONE (30s)",
+        add: "Pure Addition ➕", sub: "Pure Subtraction ➖", mix: "Mixed & 💩 Effects 🔀",
+        quest: "Quest", result: "Time's Up!", top10: "Top 10 Records (Mixed):", home: "Back to Home",
+        pos: ["Excellent!", "Amazing!", "Perfect!", "Well Done!", "Great!"],
+        neg: ["Don't give up!", "Try again!", "You can do it!", "Almost there!"],
+        modeName: {add:'Addition Practice', sub:'Subtraction Practice', mix:'Mixed Challenge'}
+    },
+    zh: {
+        title: "💩 算術大師", subtitle: "30 秒衝刺，迎接 💩 大爆發！",
+        practice: "練習區 (30秒)", challenge: "挑戰區 (30秒)",
+        add: "純加法練習 ➕", sub: "純減法練習 ➖", mix: "混合模式 & 💩 特效 🔀",
+        quest: "題數", result: "時間到！", top10: "混合模式前 10 名：", home: "返回主頁",
+        pos: ["真棒！", "太神奇了！", "完美！", "做得好！", "厲害！"],
+        neg: ["加油！", "再試一次！", "你可以的！", "差一點點！"],
+        modeName: {add:'加法練習', sub:'減法練習', mix:'混合挑戰'}
+    }
+  };
+
+  function toggleLang() {
+    currentLang = currentLang === 'en' ? 'zh' : 'en';
+    document.getElementById("lang-btn").innerText = currentLang === 'en' ? '中' : 'EN';
+    updateStaticText();
+  }
+
+  function updateStaticText() {
+    const t = i18n[currentLang];
+    document.getElementById("txt-title").innerText = t.title;
+    document.getElementById("txt-subtitle").innerText = t.subtitle;
+    document.getElementById("txt-label-practice").innerText = t.practice;
+    document.getElementById("txt-label-challenge").innerText = t.challenge;
+    document.getElementById("txt-btn-add").innerText = t.add;
+    document.getElementById("txt-btn-sub").innerText = t.sub;
+    document.getElementById("txt-btn-mix").innerText = t.mix;
+    document.getElementById("txt-quest").innerText = t.quest;
+    document.getElementById("txt-result-title").innerText = t.result;
+    document.getElementById("txt-top10").innerText = t.top10;
+    document.getElementById("txt-btn-home").innerText = t.home;
+  }
 
   function toggleMute() {
     isMuted = !isMuted;
@@ -129,40 +177,41 @@
 
   function prepareGame(mode) {
     gameMode = mode;
-    let name = document.getElementById("player-name").value.trim() || "Player";
+    let nameInput = document.getElementById("player-name").value.trim();
+    let name = nameInput || (currentLang === 'en' ? "Player" : "無名大師");
     
-    // 點擊即授權所有音效播放權
     [audioBgm, audioTick, audioWin].forEach(a => {
         a.play().then(() => { a.pause(); a.currentTime = 0; }).catch(e=>e);
     });
 
-    setTimeout(() => startGame(name), 150);
+    setTimeout(() => startGame(name), 100);
   }
 
   function startGame(name) {
-    score = 0; combo = 0; questCount = 0; gameActive = true;
+    score = 0; combo = 0; questCount = 0; timeLeft = 30; gameActive = true;
     document.getElementById("score").innerText = "0";
     document.getElementById("quest-count").innerText = "0";
+    document.getElementById("time").innerText = "30";
     showScreen("game-screen");
 
-    if (gameMode === 'mix') {
-      timeLeft = 30;
+    if(!isMuted) audioBgm.play().catch(e=>e);
+    
+    timerInterval = setInterval(() => {
+      timeLeft--;
       document.getElementById("time").innerText = timeLeft;
-      if(!isMuted) audioBgm.play().catch(e=>e);
       
-      timerInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById("time").innerText = timeLeft;
-        if (timeLeft <= 5 && timeLeft > 0) {
-            document.getElementById("time-container").classList.add("time-warning");
-            if(!isMuted) { audioTick.currentTime = 0; audioTick.play().catch(e=>e); }
-            setTimeout(()=>document.getElementById("time-container").classList.remove("time-warning"), 200);
-        }
-        if (timeLeft <= 0) { clearInterval(timerInterval); endGame(name); }
-      }, 1000);
-    } else {
-      document.getElementById("time").innerText = "∞"; // 練習模式不限時
-    }
+      if (timeLeft <= 5 && timeLeft > 0) {
+        document.getElementById("time-container").classList.add("time-warning");
+        if(!isMuted) { audioTick.currentTime = 0; audioTick.play().catch(e=>e); }
+        setTimeout(()=>document.getElementById("time-container").classList.remove("time-warning"), 200);
+      }
+
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        gameActive = false;
+        endGame(name);
+      }
+    }, 1000);
     
     generateQuestion();
   }
@@ -199,18 +248,19 @@
   function handleAnswer(selected, btn, name) {
     if(!gameActive) return;
     const fb = document.getElementById("feedback-msg");
+    const t = i18n[currentLang];
     fb.classList.remove("pop-feedback");
     
     if (selected === correctAnswer) {
       questCount++;
       combo++;
-      score += (gameMode === 'mix' ? combo * 10 : 10); // 挑戰模式有Combo加成
-      fb.innerText = positiveFeedback[Math.floor(Math.random() * positiveFeedback.length)];
+      score += combo * 10; // 所有模式現在都用 Combo 加乘
+      fb.innerText = t.pos[Math.floor(Math.random() * t.pos.length)];
       fb.style.color = "#4CAF50";
       btn.style.backgroundColor = "#c8e6c9";
     } else {
       combo = 0;
-      fb.innerText = encourageFeedback[Math.floor(Math.random() * encourageFeedback.length)];
+      fb.innerText = t.neg[Math.floor(Math.random() * t.neg.length)];
       fb.style.color = "#f44336";
       btn.style.backgroundColor = "#ffcdd2";
     }
@@ -219,32 +269,27 @@
     document.getElementById("quest-count").innerText = questCount;
     void fb.offsetWidth; 
     fb.classList.add("pop-feedback");
-
-    // 如果練習模式達到一定題數（例如20題）可以自動完結，或者讓玩家手動按返回
-    if (gameMode !== 'mix' && questCount >= 20) {
-        endGame(document.getElementById("player-name").value || "Player");
-    } else {
-        setTimeout(generateQuestion, 200);
-    }
+    setTimeout(generateQuestion, 150);
   }
 
   function endGame(name) {
-    gameActive = false;
-    clearInterval(timerInterval);
     audioBgm.pause();
     if(!isMuted) audioWin.play().catch(e=>e);
-    
     showScreen("leaderboard-screen");
-    const modeText = {add:'Addition Practice', sub:'Subtraction Practice', mix:'Mixed Challenge'}[gameMode];
-    document.getElementById("final-msg").innerText = `${name}\nMode: ${modeText}\nQuestions Solved: ${questCount}\nTotal Score: ${score}`;
+    const t = i18n[currentLang];
+    const mName = t.modeName[gameMode];
+    
+    document.getElementById("final-msg").innerText = currentLang === 'en' ? 
+        `${name}\nMode: ${mName}\nQuestions: ${questCount}\nScore: ${score}` :
+        `${name}\n模式: ${mName}\n完成題數: ${questCount}\n總得分: ${score}`;
 
     if (gameMode === 'mix') {
+      document.getElementById("record-section").style.display = "block";
       leaderboard.push({ name, score, date: new Date().toLocaleDateString() });
       leaderboard.sort((a, b) => b.score - a.score);
       localStorage.setItem("mathPooLeaderboard", JSON.stringify(leaderboard.slice(0, 10)));
       updateLeaderboard();
       
-      // 只有挑戰模式有爆發特效
       const poo = confetti.shapeFromText({ text: '💩', scalar: 2.5 });
       let bursts = 0;
       const interval = setInterval(() => {
@@ -260,7 +305,7 @@
       }, 350);
     } else {
         document.getElementById("record-section").style.display = "none";
-        document.getElementById("result-title").innerText = "Practice Complete!";
+        document.getElementById("txt-result-title").innerText = currentLang === 'en' ? "Practice Done!" : "練習完成！";
     }
   }
 
@@ -276,6 +321,8 @@
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
   }
+
+  updateStaticText();
 </script>
 </body>
 </html>
