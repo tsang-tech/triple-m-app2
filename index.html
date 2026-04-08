@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💩 Math Master - World Challenge 3.2</title>
+<title>💩 Math Master - World Challenge 3.3</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   body { 
@@ -84,8 +84,8 @@
   </div>
 
   <div id="start-screen" class="screen active">
-    <h1 id="txt-title" style="margin-bottom: 5px;">💩 Math Mastery</h1>
-    <p id="txt-subtitle" style="color:#795548; font-size:0.9rem; margin-top:0;">30 Seconds to burst the Poo!</p>
+    <h1 id="txt-title">💩 Math Mastery</h1>
+    <p id="txt-subtitle">30 Seconds to burst the Poo!</p>
     
     <div class="input-row">
       <select id="player-country">
@@ -134,7 +134,7 @@
   </div>
 
   <div id="leaderboard-screen" class="screen">
-    <h1 id="txt-result-title" style="margin:10px 0;">Time's Up!</h1>
+    <h1 id="txt-result-title">Time's Up!</h1>
     <p id="final-msg" style="font-weight:bold; color:#795548; white-space: pre-wrap; margin-bottom:15px; font-size:1.1rem;"></p>
     
     <div id="record-section">
@@ -154,9 +154,9 @@
   let questionStartTime = 0;
   let currentActiveTab = 'world';
 
-  // 1. 預設上一位玩家的名字
+  // 1. 記憶名字功能
   window.onload = () => {
-    const savedName = localStorage.getItem("mathPoo_lastPlayer");
+    const savedName = localStorage.getItem("mathPoo_lastPlayerName");
     if (savedName) document.getElementById("player-name").value = savedName;
     updateStaticText();
   };
@@ -172,8 +172,10 @@
         practice: "PRACTICE AREA", challenge: "CHALLENGE ZONE",
         add10: "Add (10 or below) ➕", sub10: "Sub (10 or below) ➖",
         add20: "Add (20 or below) ➕", sub20: "Sub (20 or below) ➖", 
-        mix: "Mixed Grand Challenge 🔀", viewlb: "🏆 Leaderboard",
-        quest: "Quest", resultEnd: "Time's Up!", home: "Back to Home"
+        mix: "Mixed Challenge (20 or below) 🔀", viewlb: "🏆 Leaderboard",
+        quest: "Quest", resultEnd: "Time's Up!", home: "Back to Home",
+        pos: ["Excellent!", "Fast!", "Perfect!", "Well Done!"],
+        neg: ["Don't give up!", "Try again!", "Almost!"]
     },
     zh: {
         title: "💩 算術大師", subtitle: "30 秒衝刺，迎接 💩 大爆發！",
@@ -181,7 +183,9 @@
         add10: "10或以內加法 ➕", sub10: "10或以內減法 ➖",
         add20: "20或以內加法 ➕", sub20: "20或以內減法 ➖", 
         mix: "混合加減大挑戰 🔀", viewlb: "🏆 查看龍虎榜",
-        quest: "題數", resultEnd: "時間到！", home: "返回主頁"
+        quest: "題數", resultEnd: "時間到！", home: "返回主頁",
+        pos: ["神速！", "太厲害了！", "完美！", "做得好！"],
+        neg: ["加油！", "再試一次！", "差一點點！"]
     }
   };
 
@@ -217,9 +221,7 @@
     gameMode = mode;
     let name = document.getElementById("player-name").value.trim() || (currentLang === 'en' ? "Player" : "無名大師");
     let flag = document.getElementById("player-country").value.substring(0,2);
-    
-    // 儲存名字
-    localStorage.setItem("mathPoo_lastPlayer", name);
+    localStorage.setItem("mathPoo_lastPlayerName", name);
 
     [audioBgm, audioTick, audioWin].forEach(a => { a.play().then(() => { a.pause(); a.currentTime = 0; }).catch(e=>e); });
     startGame(name, flag);
@@ -228,7 +230,9 @@
   function startGame(name, flag) {
     score = 0; combo = 0; questCount = 0; timeLeft = 30; gameActive = true;
     document.getElementById("score").innerText = "0";
+    document.getElementById("quest-count").innerText = "0";
     document.getElementById("time").innerText = "30";
+    document.getElementById("score-popup").innerText = "";
     showScreen("game-screen");
     if(!isMuted) audioBgm.play().catch(e=>e);
     
@@ -242,7 +246,7 @@
   }
 
   function generateQuestion() {
-    // 2. 核心邏輯：所有參與數字都在範圍內
+    // 2. 核心邏輯：10 或 20 以內
     let limit = (gameMode.includes('10')) ? 10 : 20;
     let op = gameMode.startsWith('sub') ? 'sub' : (gameMode === 'mix' ? (Math.random() > 0.5 ? 'add' : 'sub') : 'add');
 
@@ -254,7 +258,7 @@
         document.getElementById("op-sign").innerText = "+";
     } else {
         n1 = Math.floor(Math.random() * (limit + 1));
-        n2 = Math.floor(Math.random() * (n1 + 1)); // 減數不能大於被減數
+        n2 = Math.floor(Math.random() * (n1 + 1)); 
         correctAnswer = n1 - n2;
         document.getElementById("op-sign").innerText = "-";
     }
@@ -265,7 +269,7 @@
     
     let opts = [correctAnswer];
     while (opts.length < 4) {
-      let wrong = correctAnswer + (Math.floor(Math.random() * 7) - 3);
+      let wrong = correctAnswer + (Math.floor(Math.random() * 9) - 4);
       if (wrong >= 0 && !opts.includes(wrong)) opts.push(wrong);
     }
     opts.sort(() => Math.random() - 0.5);
@@ -285,20 +289,27 @@
     if(!gameActive) return;
     const fb = document.getElementById("feedback-msg");
     const sp = document.getElementById("score-popup");
+    const t = i18n[currentLang];
     fb.classList.remove("pop-feedback");
     
     if (selected === correctAnswer) {
+      // 3. 恢復 3.0 版本計分方式
       let timeUsed = (Date.now() - questionStartTime) / 1000;
-      let earned = Math.max(1, 10 - Math.floor(timeUsed / 0.5)) * (++combo);
+      let basePts = Math.max(1, 10 - Math.floor(timeUsed / 0.5));
+      questCount++; combo++;
+      let earned = basePts * combo;
       score += earned;
-      questCount++;
-      fb.innerText = "👍"; fb.style.color = "#4CAF50";
+      
+      // 4. 恢復鼓勵語言
+      fb.innerText = t.pos[Math.floor(Math.random() * t.pos.length)];
+      fb.style.color = "#4CAF50";
       sp.innerText = `+${earned} (x${combo})`;
       btn.style.backgroundColor = "#c8e6c9";
     } else {
       combo = 0;
-      fb.innerText = "❌"; fb.style.color = "#f44336";
-      sp.innerText = "Broken!";
+      fb.innerText = t.neg[Math.floor(Math.random() * t.neg.length)];
+      fb.style.color = "#f44336";
+      sp.innerText = "Combo Broken!";
       btn.style.backgroundColor = "#ffcdd2";
     }
     
@@ -313,6 +324,8 @@
     if(!isMuted) audioWin.play().catch(e=>e);
     showScreen("leaderboard-screen");
     
+    const t = i18n[currentLang];
+    document.getElementById("txt-result-title").innerText = t.resultEnd;
     document.getElementById("final-msg").innerText = `${flag} ${name}\nScore: ${score}\nQuests: ${questCount}`;
     
     if (gameMode === 'mix') {
@@ -321,9 +334,9 @@
         renderLeaderboard();
         
         const poo = confetti.shapeFromText({ text: '💩' });
-        for(let i=0; i<10; i++) {
+        for(let i=0; i<12; i++) {
             setTimeout(() => {
-                confetti({ particleCount: 30, spread: 100, origin: { y: 0.6 }, shapes: [poo], scalar: 2 });
+                confetti({ particleCount: 35, spread: 120, origin: { y: 0.6 }, shapes: [poo], scalar: 2 });
             }, i * 200);
         }
     }
@@ -332,11 +345,13 @@
   function renderLeaderboard() {
       const list = document.getElementById("leaderboard-list");
       list.innerHTML = "";
+      let lastPlayer = localStorage.getItem("mathPoo_lastPlayerName");
       let data = (currentActiveTab === 'personal') ? 
-                 leaderboard.filter(e => e.name === localStorage.getItem("mathPoo_lastPlayer")) : leaderboard;
+                 leaderboard.filter(e => e.name === lastPlayer) : leaderboard;
       
-      data.sort((a, b) => b.score - a.score).slice(0, 20).forEach((e, i) => {
-          list.innerHTML += `<li><span>${i+1}. ${e.flag} ${e.name}</span><b>${e.score}</b></li>`;
+      data.sort((a, b) => b.score - a.score).slice(0, 25).forEach((e, i) => {
+          let medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i+1}.`;
+          list.innerHTML += `<li><span>${medal} ${e.flag} ${e.name}</span><b>${e.score}</b></li>`;
       });
   }
 
