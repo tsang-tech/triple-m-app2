@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💩 Math Master - World Challenge 3.1</title>
+<title>💩 Math Master - World Challenge 3.2</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   body { 
@@ -67,13 +67,8 @@
   #player-country { font-size: 1.5rem; padding: 5px; border-radius: 8px; border: 2px solid #ddd; background: white; cursor: pointer; width: 35%; text-align: center;}
   #player-name { font-size: 1.2rem; padding: 10px; border-radius: 8px; border: 2px solid #ddd; width: 60%; box-sizing: border-box; }
 
-  .lb-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
-  .lb-tab { flex: 1; padding: 10px 5px; border: none; border-radius: 8px; background: #eee; cursor: pointer; font-weight: bold; color: #555; transition: 0.2s;}
-  .lb-tab.active { background: #ff9800; color: white; box-shadow: 0 2px 0 #e65100;}
-
   #leaderboard-list { list-style: none; padding: 0; text-align: left; max-height: 250px; overflow-y: auto; font-size: 0.9rem; margin-top: 10px;}
   #leaderboard-list li { display: flex; justify-content: space-between; padding: 10px 5px; border-bottom: 1px dotted #ccc; align-items: center; }
-  .empty-msg { text-align: center; color: #999; margin-top: 20px; font-style: italic; }
 </style>
 </head>
 <body>
@@ -94,41 +89,13 @@
     
     <div class="input-row">
       <select id="player-country">
-        <optgroup label="Asia">
-            <option value="🇭🇰" selected>🇭🇰 HK</option>
-            <option value="🇲🇴">🇲🇴 MO</option>
-            <option value="🇹🇼">🇹🇼 TW</option>
-            <option value="🇨🇳">🇨🇳 CN</option>
-            <option value="🇯🇵">🇯🇵 JP</option>
-            <option value="🇰🇷">🇰🇷 KR</option>
-            <option value="🇸🇬">🇸🇬 SG</option>
-            <option value="🇲🇾">🇲🇾 MY</option>
-            <option value="🇹🇭">🇹🇭 TH</option>
-            <option value="🇻🇳">🇻🇳 VN</option>
-            <option value="🇵🇭">🇵🇭 PH</option>
-            <option value="🇮🇳">🇮🇳 IN</option>
-        </optgroup>
-        <optgroup label="Americas">
-            <option value="🇺🇸">🇺🇸 US</option>
-            <option value="🇨🇦">🇨🇦 CA</option>
-            <option value="🇲🇽">🇲🇽 MX</option>
-            <option value="🇧🇷">🇧🇷 BR</option>
-            <option value="🇦🇷">🇦🇷 AR</option>
-        </optgroup>
-        <optgroup label="Europe">
-            <option value="🇬🇧">🇬🇧 UK</option>
-            <option value="🇫🇷">🇫🇷 FR</option>
-            <option value="🇩🇪">🇩🇪 DE</option>
-            <option value="🇮🇹">🇮🇹 IT</option>
-            <option value="🇪🇸">🇪🇸 ES</option>
-            <option value="🇵🇹">🇵🇹 PT</option>
-        </optgroup>
-        <optgroup label="Oceania & Africa">
-            <option value="🇦🇺">🇦🇺 AU</option>
-            <option value="🇳🇿">🇳🇿 NZ</option>
-            <option value="🇿🇦">🇿🇦 ZA</option>
-            <option value="🌍">🌍 Earth</option>
-        </optgroup>
+        <option value="🇭🇰" selected>🇭🇰 HK</option>
+        <option value="🇲🇴">🇲🇴 MO</option>
+        <option value="🇹🇼">🇹🇼 TW</option>
+        <option value="🇨🇳">🇨🇳 CN</option>
+        <option value="🇺🇸">🇺🇸 US</option>
+        <option value="🇬🇧">🇬🇧 UK</option>
+        <option value="🌍">🌍 Earth</option>
       </select>
       <input type="text" id="player-name" placeholder="Name / 名字" maxlength="10">
     </div>
@@ -143,7 +110,6 @@
     
     <div class="mode-label" id="txt-label-challenge">CHALLENGE ZONE (30s)</div>
     <button class="btn-mode bg-challenge" onclick="prepareGame('mix')" id="txt-btn-mix">混合加減大挑戰 🔀</button>
-
     <button class="btn-mode bg-view-lb" onclick="openLeaderboardOnly()" id="txt-btn-viewlb">🏆 View Leaderboard</button>
   </div>
 
@@ -172,14 +138,13 @@
     <p id="final-msg" style="font-weight:bold; color:#795548; white-space: pre-wrap; margin-bottom:15px; font-size:1.1rem;"></p>
     
     <div id="record-section">
-        <div class="lb-tabs">
-            <button class="lb-tab active" id="tab-world" onclick="switchTab('world')">World</button>
-            <button class="lb-tab" id="tab-regional" onclick="switchTab('regional')">Region</button>
-            <button class="lb-tab" id="tab-personal" onclick="switchTab('personal')">Personal</button>
+        <div class="lb-tabs" style="display:flex; gap:5px; margin-bottom:10px;">
+            <button class="lb-tab active" style="flex:1; padding:10px; border:none; border-radius:8px; background:#ff9800; color:white; font-weight:bold;" id="tab-world" onclick="switchTab('world')">World</button>
+            <button class="lb-tab" style="flex:1; padding:10px; border:none; border-radius:8px; background:#eee;" id="tab-personal" onclick="switchTab('personal')">Personal</button>
         </div>
         <ul id="leaderboard-list"></ul>
     </div>
-    <button class="btn-mode" style="background:#444; margin-top:15px; padding:15px; font-size:1.1rem;" onclick="location.reload()" id="txt-btn-home">Back to Home</button>
+    <button class="btn-mode" style="background:#444; margin-top:15px; padding:15px;" onclick="location.reload()" id="txt-btn-home">Back to Home</button>
   </div>
 </div>
 
@@ -188,28 +153,27 @@
   let combo = 0, questCount = 0, gameActive = false, isMuted = false, currentLang = 'zh'; 
   let questionStartTime = 0;
   let currentActiveTab = 'world';
-  
-  // 記憶名字功能：從本地儲存讀取上次名字
-  let savedName = localStorage.getItem("mathPoo_lastPlayerName") || "";
-  document.getElementById("player-name").value = savedName;
+
+  // 1. 預設上一位玩家的名字
+  window.onload = () => {
+    const savedName = localStorage.getItem("mathPoo_lastPlayer");
+    if (savedName) document.getElementById("player-name").value = savedName;
+    updateStaticText();
+  };
 
   let leaderboard = JSON.parse(localStorage.getItem("mathPooLeaderboardV3")) || [];
-
   const audioBgm = document.getElementById("audio-bgm");
   const audioTick = document.getElementById("audio-tick");
   const audioWin = document.getElementById("audio-win");
 
   const i18n = {
     en: {
-        title: "💩 Math Mastery", subtitle: "30 Seconds to burst the Poo!",
-        practice: "PRACTICE AREA (30s)", challenge: "CHALLENGE ZONE (30s)",
+        title: "💩 Math Mastery", subtitle: "30 Seconds Challenge!",
+        practice: "PRACTICE AREA", challenge: "CHALLENGE ZONE",
         add10: "Add (10 or below) ➕", sub10: "Sub (10 or below) ➖",
         add20: "Add (20 or below) ➕", sub20: "Sub (20 or below) ➖", 
-        mix: "Mixed Challenge (20 or below) 🔀", viewlb: "🏆 View Leaderboard",
-        quest: "Quest", resultEnd: "Time's Up!", resultView: "🏆 Leaderboard", home: "Back to Home",
-        tabWorld: "World", tabRegion: "Region", tabPersonal: "Personal", empty: "No records yet!",
-        pos: ["Excellent!", "Fast!", "Perfect!", "Well Done!"],
-        neg: ["Don't give up!", "Try again!", "Almost!"]
+        mix: "Mixed Grand Challenge 🔀", viewlb: "🏆 Leaderboard",
+        quest: "Quest", resultEnd: "Time's Up!", home: "Back to Home"
     },
     zh: {
         title: "💩 算術大師", subtitle: "30 秒衝刺，迎接 💩 大爆發！",
@@ -217,10 +181,7 @@
         add10: "10或以內加法 ➕", sub10: "10或以內減法 ➖",
         add20: "20或以內加法 ➕", sub20: "20或以內減法 ➖", 
         mix: "混合加減大挑戰 🔀", viewlb: "🏆 查看龍虎榜",
-        quest: "題數", resultEnd: "時間到！", resultView: "🏆 龍虎榜", home: "返回主頁",
-        tabWorld: "🌍 世界", tabRegion: "📍 地區", tabPersonal: "👤 個人", empty: "暫時未有紀錄喔！",
-        pos: ["神速！", "太厲害了！", "完美！", "做得好！"],
-        neg: ["加油！", "再試一次！", "差一點點！"]
+        quest: "題數", resultEnd: "時間到！", home: "返回主頁"
     }
   };
 
@@ -244,18 +205,6 @@
     document.getElementById("txt-btn-viewlb").innerText = t.viewlb;
     document.getElementById("txt-quest").innerText = t.quest;
     document.getElementById("txt-btn-home").innerText = t.home;
-    document.getElementById("tab-world").innerText = t.tabWorld;
-    document.getElementById("tab-regional").innerText = t.tabRegion;
-    document.getElementById("tab-personal").innerText = t.tabPersonal;
-    
-    if(document.getElementById("leaderboard-screen").classList.contains("active")) {
-        if(document.getElementById("final-msg").style.display === "none") {
-            document.getElementById("txt-result-title").innerText = t.resultView;
-        } else {
-            document.getElementById("txt-result-title").innerText = t.resultEnd;
-        }
-        renderLeaderboard();
-    }
   }
 
   function toggleMute() {
@@ -264,79 +213,47 @@
     [audioBgm, audioTick, audioWin].forEach(a => a.muted = isMuted);
   }
 
-  function openLeaderboardOnly() {
-      showScreen("leaderboard-screen");
-      document.getElementById("txt-result-title").innerText = i18n[currentLang].resultView;
-      document.getElementById("final-msg").style.display = "none";
-      document.getElementById("record-section").style.display = "block";
-      switchTab('world');
-  }
-
   function prepareGame(mode) {
     gameMode = mode;
-    let nameInput = document.getElementById("player-name").value.trim();
-    let name = nameInput || (currentLang === 'en' ? "Player" : "無名大師");
-    let flagRaw = document.getElementById("player-country").value;
-    let flag = flagRaw.substring(0,2);
+    let name = document.getElementById("player-name").value.trim() || (currentLang === 'en' ? "Player" : "無名大師");
+    let flag = document.getElementById("player-country").value.substring(0,2);
     
-    // 儲存名字供下次使用
-    localStorage.setItem("mathPoo_lastPlayerName", nameInput);
-    
-    [audioBgm, audioTick, audioWin].forEach(a => {
-        a.play().then(() => { a.pause(); a.currentTime = 0; }).catch(e=>e);
-    });
+    // 儲存名字
+    localStorage.setItem("mathPoo_lastPlayer", name);
 
-    setTimeout(() => startGame(name, flag), 100);
+    [audioBgm, audioTick, audioWin].forEach(a => { a.play().then(() => { a.pause(); a.currentTime = 0; }).catch(e=>e); });
+    startGame(name, flag);
   }
 
   function startGame(name, flag) {
     score = 0; combo = 0; questCount = 0; timeLeft = 30; gameActive = true;
     document.getElementById("score").innerText = "0";
-    document.getElementById("quest-count").innerText = "0";
     document.getElementById("time").innerText = "30";
-    document.getElementById("score-popup").innerText = "";
     showScreen("game-screen");
-
     if(!isMuted) audioBgm.play().catch(e=>e);
     
     timerInterval = setInterval(() => {
       timeLeft--;
       document.getElementById("time").innerText = timeLeft;
-      
-      if (timeLeft <= 5 && timeLeft > 0) {
-        document.getElementById("time-container").classList.add("time-warning");
-        if(!isMuted) { audioTick.currentTime = 0; audioTick.play().catch(e=>e); }
-        setTimeout(()=>document.getElementById("time-container").classList.remove("time-warning"), 200);
-      }
-
-      if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        gameActive = false;
-        endGame(name, flag);
-      }
+      if (timeLeft <= 5 && timeLeft > 0) document.getElementById("time-container").classList.add("time-warning");
+      if (timeLeft <= 0) { clearInterval(timerInterval); endGame(name, flag); }
     }, 1000);
-    
     generateQuestion();
   }
 
   function generateQuestion() {
-    // 根據玩家要求修正邏輯：10以內指兩個數字本身都在10或以下
-    let maxVal = (gameMode === 'add10' || gameMode === 'sub10') ? 10 : 20;
-    let currentOp = 'add';
-    if (gameMode.startsWith('sub')) currentOp = 'sub';
-    else if (gameMode === 'mix') {
-        currentOp = Math.random() > 0.5 ? 'add' : 'sub';
-        maxVal = 20; // 挑戰區統一 20 以內
-    }
+    // 2. 核心邏輯：所有參與數字都在範圍內
+    let limit = (gameMode.includes('10')) ? 10 : 20;
+    let op = gameMode.startsWith('sub') ? 'sub' : (gameMode === 'mix' ? (Math.random() > 0.5 ? 'add' : 'sub') : 'add');
 
     let n1, n2;
-    if (currentOp === 'add') {
-        n1 = Math.floor(Math.random() * (maxVal + 1));
-        n2 = Math.floor(Math.random() * (maxVal + 1));
+    if (op === 'add') {
+        n1 = Math.floor(Math.random() * (limit + 1));
+        n2 = Math.floor(Math.random() * (limit + 1));
         correctAnswer = n1 + n2;
         document.getElementById("op-sign").innerText = "+";
     } else {
-        n1 = Math.floor(Math.random() * (maxVal + 1));
+        n1 = Math.floor(Math.random() * (limit + 1));
         n2 = Math.floor(Math.random() * (n1 + 1)); // 減數不能大於被減數
         correctAnswer = n1 - n2;
         document.getElementById("op-sign").innerText = "-";
@@ -348,7 +265,7 @@
     
     let opts = [correctAnswer];
     while (opts.length < 4) {
-      let wrong = correctAnswer + (Math.floor(Math.random() * 11) - 5);
+      let wrong = correctAnswer + (Math.floor(Math.random() * 7) - 3);
       if (wrong >= 0 && !opts.includes(wrong)) opts.push(wrong);
     }
     opts.sort(() => Math.random() - 0.5);
@@ -368,109 +285,67 @@
     if(!gameActive) return;
     const fb = document.getElementById("feedback-msg");
     const sp = document.getElementById("score-popup");
-    const t = i18n[currentLang];
     fb.classList.remove("pop-feedback");
     
     if (selected === correctAnswer) {
       let timeUsed = (Date.now() - questionStartTime) / 1000;
-      let basePts = Math.max(1, 10 - Math.floor(timeUsed / 0.5));
-      questCount++; combo++;
-      let earned = basePts * combo; 
+      let earned = Math.max(1, 10 - Math.floor(timeUsed / 0.5)) * (++combo);
       score += earned;
-      fb.innerText = t.pos[Math.floor(Math.random() * t.pos.length)];
-      fb.style.color = "#4CAF50";
+      questCount++;
+      fb.innerText = "👍"; fb.style.color = "#4CAF50";
       sp.innerText = `+${earned} (x${combo})`;
       btn.style.backgroundColor = "#c8e6c9";
     } else {
       combo = 0;
-      fb.innerText = t.neg[Math.floor(Math.random() * t.neg.length)];
-      fb.style.color = "#f44336";
-      sp.innerText = `Combo Broken!`;
+      fb.innerText = "❌"; fb.style.color = "#f44336";
+      sp.innerText = "Broken!";
       btn.style.backgroundColor = "#ffcdd2";
     }
     
     document.getElementById("score").innerText = score;
     document.getElementById("quest-count").innerText = questCount;
-    void fb.offsetWidth; 
-    fb.classList.add("pop-feedback");
+    void fb.offsetWidth; fb.classList.add("pop-feedback");
     setTimeout(generateQuestion, 150);
   }
 
   function endGame(name, flag) {
-    audioBgm.pause();
+    gameActive = false; audioBgm.pause();
     if(!isMuted) audioWin.play().catch(e=>e);
     showScreen("leaderboard-screen");
-    const t = i18n[currentLang];
     
-    document.getElementById("txt-result-title").innerText = t.resultEnd;
-    document.getElementById("final-msg").style.display = "block";
+    document.getElementById("final-msg").innerText = `${flag} ${name}\nScore: ${score}\nQuests: ${questCount}`;
     
-    let modeLabel = document.getElementById(`txt-btn-${gameMode}`).innerText;
-    
-    document.getElementById("final-msg").innerText = currentLang === 'en' ? 
-        `${flag} ${name}\nMode: ${modeLabel}\nQuestions: ${questCount}\nTotal Score: ${score}` :
-        `${flag} ${name}\n模式: ${modeLabel}\n答對題數: ${questCount}\n總得分: ${score}`;
-
     if (gameMode === 'mix') {
-      document.getElementById("record-section").style.display = "block";
-      leaderboard.push({ name, flag, score, date: new Date().toLocaleDateString() });
-      localStorage.setItem("mathPooLeaderboardV3", JSON.stringify(leaderboard));
-      switchTab('world');
-      
-      const poo = confetti.shapeFromText({ text: '💩' });
-      let burstCount = 0;
-      const interval = setInterval(() => {
-          let currentScalar = 1.0 + (burstCount * 0.3);
-          let currentVelocity = 30 + (burstCount * 2);
-          confetti({
-              particleCount: Math.min(Math.ceil(score / 5), 40), spread: 160, origin: { y: 0.6, x: 0.5 },
-              startVelocity: currentVelocity, gravity: 0.8, shapes: [poo], scalar: currentScalar, zIndex: 1000 + burstCount
-          });
-          burstCount++;
-          if(burstCount >= 15) clearInterval(interval);
-      }, 250); 
-    } else {
-        document.getElementById("record-section").style.display = "none";
-        document.getElementById("txt-result-title").innerText = currentLang === 'en' ? "Practice Done!" : "練習完成！";
+        leaderboard.push({ name, flag, score, date: new Date().toLocaleDateString() });
+        localStorage.setItem("mathPooLeaderboardV3", JSON.stringify(leaderboard));
+        renderLeaderboard();
+        
+        const poo = confetti.shapeFromText({ text: '💩' });
+        for(let i=0; i<10; i++) {
+            setTimeout(() => {
+                confetti({ particleCount: 30, spread: 100, origin: { y: 0.6 }, shapes: [poo], scalar: 2 });
+            }, i * 200);
+        }
     }
-  }
-
-  function switchTab(tab) {
-      currentActiveTab = tab;
-      document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
-      document.getElementById(`tab-${tab}`).classList.add('active');
-      renderLeaderboard();
   }
 
   function renderLeaderboard() {
       const list = document.getElementById("leaderboard-list");
       list.innerHTML = "";
+      let data = (currentActiveTab === 'personal') ? 
+                 leaderboard.filter(e => e.name === localStorage.getItem("mathPoo_lastPlayer")) : leaderboard;
       
-      let filtered = [];
-      let currentName = document.getElementById("player-name").value.trim() || (currentLang === 'en' ? "Player" : "無名大師");
-      let currentFlagRaw = document.getElementById("player-country").value;
-      let currentFlag = currentFlagRaw.substring(0,2);
-      
-      if (currentActiveTab === 'personal') {
-          filtered = leaderboard.filter(e => e.name === currentName);
-      } else if (currentActiveTab === 'regional') {
-          filtered = leaderboard.filter(e => e.flag === currentFlag);
-      } else {
-          filtered = leaderboard;
-      }
-      
-      filtered.sort((a, b) => b.score - a.score);
-      let topList = filtered.slice(0, 50);
-
-      if(topList.length === 0) {
-          list.innerHTML = `<div class="empty-msg">${i18n[currentLang].empty}</div>`;
-          return;
-      }
-
-      topList.forEach((e, i) => {
-          let medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i+1}.`;
-          list.innerHTML += `<li><span><span style="display:inline-block; width:28px; text-align:center;">${medal}</span> ${e.flag} <b>${e.name}</b></span><span style="color:#1976d2; font-weight:bold;">${e.score} pts</span></li>`;
+      data.sort((a, b) => b.score - a.score).slice(0, 20).forEach((e, i) => {
+          list.innerHTML += `<li><span>${i+1}. ${e.flag} ${e.name}</span><b>${e.score}</b></li>`;
       });
+  }
+
+  function switchTab(tab) {
+      currentActiveTab = tab;
+      document.querySelectorAll('.lb-tab').forEach(b => { b.style.background = "#eee"; b.style.color = "#000"; });
+      document.getElementById(`tab-${tab}`).style.background = "#ff9800";
+      document.getElementById(`tab-${tab}`).style.color = "white";
+      renderLeaderboard();
   }
 
   function showScreen(id) {
@@ -478,8 +353,7 @@
     document.getElementById(id).classList.add('active');
   }
 
-  updateStaticText();
-  document.getElementById("lang-btn").innerText = 'EN'; 
+  function openLeaderboardOnly() { showScreen("leaderboard-screen"); switchTab('world'); }
 </script>
 </body>
 </html>
