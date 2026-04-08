@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💩 Math Master - World Challenge</title>
+<title>💩 Math Master - World Challenge 3.1</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   body { 
@@ -19,7 +19,6 @@
   .screen { display: none; }
   .active { display: block; }
   
-  /* 右下角控制區 */
   .controls-footer {
     position: absolute; bottom: 15px; right: 15px;
     display: flex; gap: 10px; z-index: 100;
@@ -68,7 +67,6 @@
   #player-country { font-size: 1.5rem; padding: 5px; border-radius: 8px; border: 2px solid #ddd; background: white; cursor: pointer; width: 35%; text-align: center;}
   #player-name { font-size: 1.2rem; padding: 10px; border-radius: 8px; border: 2px solid #ddd; width: 60%; box-sizing: border-box; }
 
-  /* 龍虎榜分頁設計 */
   .lb-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
   .lb-tab { flex: 1; padding: 10px 5px; border: none; border-radius: 8px; background: #eee; cursor: pointer; font-weight: bold; color: #555; transition: 0.2s;}
   .lb-tab.active { background: #ff9800; color: white; box-shadow: 0 2px 0 #e65100;}
@@ -137,14 +135,14 @@
     
     <div class="mode-label" id="txt-label-practice">PRACTICE AREA (30s)</div>
     <div class="options-grid">
-        <button class="btn-mode bg-practice" onclick="prepareGame('add10')" id="txt-btn-add10">Add (≤10) ➕</button>
-        <button class="btn-mode bg-practice" onclick="prepareGame('sub10')" id="txt-btn-sub10">Sub (≤10) ➖</button>
-        <button class="btn-mode bg-practice" onclick="prepareGame('add20')" id="txt-btn-add20">Add (≤20) ➕</button>
-        <button class="btn-mode bg-practice" onclick="prepareGame('sub20')" id="txt-btn-sub20">Sub (≤20) ➖</button>
+        <button class="btn-mode bg-practice" onclick="prepareGame('add10')" id="txt-btn-add10">10或以內加法 ➕</button>
+        <button class="btn-mode bg-practice" onclick="prepareGame('sub10')" id="txt-btn-sub10">10或以內減法 ➖</button>
+        <button class="btn-mode bg-practice" onclick="prepareGame('add20')" id="txt-btn-add20">20或以內加法 ➕</button>
+        <button class="btn-mode bg-practice" onclick="prepareGame('sub20')" id="txt-btn-sub20">20或以內減法 ➖</button>
     </div>
     
     <div class="mode-label" id="txt-label-challenge">CHALLENGE ZONE (30s)</div>
-    <button class="btn-mode bg-challenge" onclick="prepareGame('mix')" id="txt-btn-mix">Mixed Math Grand Challenge 🔀</button>
+    <button class="btn-mode bg-challenge" onclick="prepareGame('mix')" id="txt-btn-mix">混合加減大挑戰 🔀</button>
 
     <button class="btn-mode bg-view-lb" onclick="openLeaderboardOnly()" id="txt-btn-viewlb">🏆 View Leaderboard</button>
   </div>
@@ -190,7 +188,11 @@
   let combo = 0, questCount = 0, gameActive = false, isMuted = false, currentLang = 'zh'; 
   let questionStartTime = 0;
   let currentActiveTab = 'world';
-  // 加入假數據確保一開始有嘢睇，亦會讀取真實記錄
+  
+  // 記憶名字功能：從本地儲存讀取上次名字
+  let savedName = localStorage.getItem("mathPoo_lastPlayerName") || "";
+  document.getElementById("player-name").value = savedName;
+
   let leaderboard = JSON.parse(localStorage.getItem("mathPooLeaderboardV3")) || [];
 
   const audioBgm = document.getElementById("audio-bgm");
@@ -201,9 +203,9 @@
     en: {
         title: "💩 Math Mastery", subtitle: "30 Seconds to burst the Poo!",
         practice: "PRACTICE AREA (30s)", challenge: "CHALLENGE ZONE (30s)",
-        add10: "Add (≤10) ➕", sub10: "Sub (≤10) ➖",
-        add20: "Add (≤20) ➕", sub20: "Sub (≤20) ➖", 
-        mix: "Mixed Math Grand Challenge 🔀", viewlb: "🏆 View Leaderboard",
+        add10: "Add (10 or below) ➕", sub10: "Sub (10 or below) ➖",
+        add20: "Add (20 or below) ➕", sub20: "Sub (20 or below) ➖", 
+        mix: "Mixed Challenge (20 or below) 🔀", viewlb: "🏆 View Leaderboard",
         quest: "Quest", resultEnd: "Time's Up!", resultView: "🏆 Leaderboard", home: "Back to Home",
         tabWorld: "World", tabRegion: "Region", tabPersonal: "Personal", empty: "No records yet!",
         pos: ["Excellent!", "Fast!", "Perfect!", "Well Done!"],
@@ -212,9 +214,9 @@
     zh: {
         title: "💩 算術大師", subtitle: "30 秒衝刺，迎接 💩 大爆發！",
         practice: "練習區 (30秒限時)", challenge: "挑戰區 (30秒限時)",
-        add10: "10以內加法 ➕", sub10: "10以內減法 ➖",
-        add20: "20以內加法 ➕", sub20: "20以內減法 ➖", 
-        mix: "混合加減心算大挑戰 🔀", viewlb: "🏆 查看龍虎榜",
+        add10: "10或以內加法 ➕", sub10: "10或以內減法 ➖",
+        add20: "20或以內加法 ➕", sub20: "20或以內減法 ➖", 
+        mix: "混合加減大挑戰 🔀", viewlb: "🏆 查看龍虎榜",
         quest: "題數", resultEnd: "時間到！", resultView: "🏆 龍虎榜", home: "返回主頁",
         tabWorld: "🌍 世界", tabRegion: "📍 地區", tabPersonal: "👤 個人", empty: "暫時未有紀錄喔！",
         pos: ["神速！", "太厲害了！", "完美！", "做得好！"],
@@ -246,14 +248,13 @@
     document.getElementById("tab-regional").innerText = t.tabRegion;
     document.getElementById("tab-personal").innerText = t.tabPersonal;
     
-    // 如果已經喺龍虎榜頁面，動態改標題
     if(document.getElementById("leaderboard-screen").classList.contains("active")) {
         if(document.getElementById("final-msg").style.display === "none") {
             document.getElementById("txt-result-title").innerText = t.resultView;
         } else {
             document.getElementById("txt-result-title").innerText = t.resultEnd;
         }
-        renderLeaderboard(); // 刷新列表以顯示正確語言嘅 empty message
+        renderLeaderboard();
     }
   }
 
@@ -263,13 +264,12 @@
     [audioBgm, audioTick, audioWin].forEach(a => a.muted = isMuted);
   }
 
-  // 專門用於直接查看龍虎榜
   function openLeaderboardOnly() {
       showScreen("leaderboard-screen");
       document.getElementById("txt-result-title").innerText = i18n[currentLang].resultView;
-      document.getElementById("final-msg").style.display = "none"; // 隱藏遊戲結算字句
+      document.getElementById("final-msg").style.display = "none";
       document.getElementById("record-section").style.display = "block";
-      switchTab('world'); // 預設打開世界榜
+      switchTab('world');
   }
 
   function prepareGame(mode) {
@@ -277,7 +277,10 @@
     let nameInput = document.getElementById("player-name").value.trim();
     let name = nameInput || (currentLang === 'en' ? "Player" : "無名大師");
     let flagRaw = document.getElementById("player-country").value;
-    let flag = flagRaw.substring(0,2); // 提取 Emoji，移除後面字母
+    let flag = flagRaw.substring(0,2);
+    
+    // 儲存名字供下次使用
+    localStorage.setItem("mathPoo_lastPlayerName", nameInput);
     
     [audioBgm, audioTick, audioWin].forEach(a => {
         a.play().then(() => { a.pause(); a.currentTime = 0; }).catch(e=>e);
@@ -317,21 +320,24 @@
   }
 
   function generateQuestion() {
-    let maxNum = (gameMode === 'add10' || gameMode === 'sub10') ? 10 : 20;
+    // 根據玩家要求修正邏輯：10以內指兩個數字本身都在10或以下
+    let maxVal = (gameMode === 'add10' || gameMode === 'sub10') ? 10 : 20;
     let currentOp = 'add';
     if (gameMode.startsWith('sub')) currentOp = 'sub';
-    else if (gameMode === 'mix') currentOp = Math.random() > 0.5 ? 'add' : 'sub';
+    else if (gameMode === 'mix') {
+        currentOp = Math.random() > 0.5 ? 'add' : 'sub';
+        maxVal = 20; // 挑戰區統一 20 以內
+    }
 
     let n1, n2;
     if (currentOp === 'add') {
-        let sum = Math.floor(Math.random() * (maxNum + 1));
-        n1 = Math.floor(Math.random() * (sum + 1));
-        n2 = sum - n1;
-        correctAnswer = sum;
+        n1 = Math.floor(Math.random() * (maxVal + 1));
+        n2 = Math.floor(Math.random() * (maxVal + 1));
+        correctAnswer = n1 + n2;
         document.getElementById("op-sign").innerText = "+";
     } else {
-        n1 = Math.floor(Math.random() * (maxNum + 1));
-        n2 = Math.floor(Math.random() * (n1 + 1));
+        n1 = Math.floor(Math.random() * (maxVal + 1));
+        n2 = Math.floor(Math.random() * (n1 + 1)); // 減數不能大於被減數
         correctAnswer = n1 - n2;
         document.getElementById("op-sign").innerText = "-";
     }
@@ -398,20 +404,19 @@
     
     document.getElementById("txt-result-title").innerText = t.resultEnd;
     document.getElementById("final-msg").style.display = "block";
-    let modeText = t[gameMode].replace(/ .*/,'');
+    
+    let modeLabel = document.getElementById(`txt-btn-${gameMode}`).innerText;
     
     document.getElementById("final-msg").innerText = currentLang === 'en' ? 
-        `${flag} ${name}\nMode: ${modeText}\nQuestions: ${questCount}\nTotal Score: ${score}` :
-        `${flag} ${name}\n模式: ${modeText}\n答對題數: ${questCount}\n總得分: ${score}`;
+        `${flag} ${name}\nMode: ${modeLabel}\nQuestions: ${questCount}\nTotal Score: ${score}` :
+        `${flag} ${name}\n模式: ${modeLabel}\n答對題數: ${questCount}\n總得分: ${score}`;
 
     if (gameMode === 'mix') {
       document.getElementById("record-section").style.display = "block";
       leaderboard.push({ name, flag, score, date: new Date().toLocaleDateString() });
-      // 保存至 localstorage
       localStorage.setItem("mathPooLeaderboardV3", JSON.stringify(leaderboard));
-      switchTab('world'); // 完結後預設顯示世界榜
+      switchTab('world');
       
-      // 3D Poo Poo 特效
       const poo = confetti.shapeFromText({ text: '💩' });
       let burstCount = 0;
       const interval = setInterval(() => {
@@ -430,7 +435,6 @@
     }
   }
 
-  // --- 全新龍虎榜過濾與渲染邏輯 ---
   function switchTab(tab) {
       currentActiveTab = tab;
       document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
@@ -452,10 +456,9 @@
       } else if (currentActiveTab === 'regional') {
           filtered = leaderboard.filter(e => e.flag === currentFlag);
       } else {
-          filtered = leaderboard; // World
+          filtered = leaderboard;
       }
       
-      // 按分數由高至低排，只抽頭 100 個顯示以免過長
       filtered.sort((a, b) => b.score - a.score);
       let topList = filtered.slice(0, 50);
 
