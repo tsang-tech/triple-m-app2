@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>加減混合大激鬥 - 💩 Math Master 3.8</title>
+<title>加減混合大激鬥 - 💩 Math Master 3.9</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   body { font-family: 'Segoe UI', system-ui, sans-serif; text-align: center; background-color: #fff9c4; margin: 0; padding: 20px; touch-action: manipulation; }
@@ -14,7 +14,6 @@
   .controls-footer { position: absolute; bottom: 15px; right: 15px; display: flex; gap: 10px; z-index: 100; }
   .control-btn { font-size: 1.1rem; background: #f8f8f8; border: 2px solid #ddd; border-radius: 12px; width: 50px; height: 50px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-  /* 導航分頁設計 */
   .main-tabs { display: flex; gap: 5px; margin-bottom: 15px; background: #fff59d; padding: 8px; border-radius: 12px; }
   .main-tab { flex: 1; padding: 10px 2px; border: none; border-radius: 8px; background: transparent; cursor: pointer; font-weight: 900; font-size: 0.95rem; color: #795548; transition: 0.2s;}
   .main-tab.active { background: #ff9800; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -39,7 +38,7 @@
   .option-btn { font-size: 2.2rem; padding: 15px; background-color: #fff; border: 3px solid #e0e0e0; border-radius: 15px; cursor: pointer; box-shadow: 0 5px 0 #eee; font-weight: bold; }
   .option-btn:active { transform: translateY(3px); box-shadow: none; }
 
-  .btn-mode { font-size: 1rem; padding: 12px; color: white; border: none; border-radius: 12px; cursor: pointer; width: 100%; font-weight: bold; margin-bottom: 5px;}
+  .btn-mode { font-size: 1rem; padding: 12px; color: white; border: none; border-radius: 12px; cursor: pointer; width: 100%; font-weight: bold; margin-bottom: 10px;}
   .bg-practice { background-color: #4CAF50; }
   .bg-challenge { background-color: #9c27b0; font-size: 1.1rem; padding: 15px; }
   
@@ -56,19 +55,17 @@
   .mistake-item { color: #d32f2f; }
   .correct-part { color: #388e3c; font-weight: bold; }
 
-  /* 列印專用 CSS */
   @media print {
       body * { visibility: hidden; }
       #print-area, #print-area * { visibility: visible; }
       #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; box-sizing: border-box; }
       .no-print { display: none !important; }
       .print-only-title { display: block !important; margin-bottom: 20px; }
-      .q-ans, .q-wrong { display: none !important; }
-      .print-blank { display: inline !important; }
       #app { box-shadow: none; background: transparent; padding: 0; max-height: none; }
       body { background: white; padding: 0; }
       #global-mistakes-list li { border-bottom: 1px dashed #ccc; padding: 15px 0; font-size: 1.8rem; margin-bottom: 10px; }
       .q-text { font-family: 'Courier New', monospace; font-weight: bold; }
+      .print-blank { display: inline !important; }
   }
 </style>
 </head>
@@ -90,46 +87,28 @@
     
     <div class="input-row">
       <select id="player-country">
-        <optgroup label="亞洲與地區">
-            <option value="🇭🇰" selected>🇭🇰 香港 HK</option>
-            <option value="🇲🇴">🇲🇴 澳門 MO</option>
-            <option value="🇹🇼">🇹🇼 台灣 TW</option>
-            <option value="🇨🇳">🇨🇳 中國 CN</option>
-            <option value="🇯🇵">🇯🇵 日本 JP</option>
-            <option value="🇰🇷">🇰🇷 韓國 KR</option>
-            <option value="🇸🇬">🇸🇬 新加坡 SG</option>
-            <option value="🇲🇾">🇲🇾 馬來西亞 MY</option>
-            <option value="🇹🇭">🇹🇭 泰國 TH</option>
-            <option value="🇻🇳">🇻🇳 越南 VN</option>
-        </optgroup>
-        <optgroup label="歐美與其他">
-            <option value="🇬🇧">🇬🇧 英國 UK</option>
-            <option value="🇺🇸">🇺🇸 美國 US</option>
-            <option value="🇨🇦">🇨🇦 加拿大 CA</option>
-            <option value="🇦🇺">🇦🇺 澳洲 AU</option>
-            <option value="🇫🇷">🇫🇷 法國 FR</option>
-            <option value="🇩🇪">🇩🇪 德國 DE</option>
-            <option value="🇮🇹">🇮🇹 意大利 IT</option>
-            <option value="🇪🇸">🇪🇸 西班牙 ES</option>
-        </optgroup>
-        <optgroup label="趣味選擇">
-            <option value="🌍">🌍 地球人 Earth</option>
-            <option value="🇺🇳">🇺🇳 聯合國 UN</option>
-            <option value="🏴‍☠️">🏴‍☠️ 海盜 Pirate</option>
-            <option value="🏁">🏁 賽車手 Racing</option>
-        </optgroup>
+        <option value="🇭🇰" selected>🇭🇰 香港 HK</option>
+        <option value="🇲🇴">🇲🇴 澳門 MO</option>
+        <option value="🇹🇼">🇹🇼 台灣 TW</option>
+        <option value="🇺🇸">🇺🇸 美國 US</option>
+        <option value="🇬🇧">🇬🇧 英國 UK</option>
+        <option value="🇯🇵">🇯🇵 日本 JP</option>
       </select>
       <input type="text" id="player-name" placeholder="Name / 名字" maxlength="10">
     </div>
 
     <div class="main-tabs">
-        <button class="main-tab active" onclick="switchMainTab('practice')" id="tab-main-practice">練習區</button>
-        <button class="main-tab" onclick="switchMainTab('challenge')" id="tab-main-challenge">挑戰區</button>
-        <button class="main-tab" onclick="switchMainTab('leaderboard')" id="tab-main-lb">龍虎榜</button>
+        <button class="main-tab active" onclick="switchMainTab('challenge')" id="tab-main-challenge">挑戰區</button>
+        <button class="main-tab" onclick="switchMainTab('practice')" id="tab-main-practice">練習區</button>
+        <button class="main-tab" onclick="switchMainTab('leaderboard')" id="tab-main-leaderboard">龍虎榜</button>
         <button class="main-tab" onclick="switchMainTab('mistakes')" id="tab-main-mistakes">錯題再練</button>
     </div>
     
-    <div id="view-practice" class="main-view active">
+    <div id="view-challenge" class="main-view active">
+        <button class="btn-mode bg-challenge" onclick="prepareGame('mix')" id="txt-btn-mix">混合加減大挑戰 🔀</button>
+    </div>
+
+    <div id="view-practice" class="main-view">
         <div class="options-grid">
             <button class="btn-mode bg-practice" onclick="prepareGame('add10')" id="txt-btn-add10">10或以內加法 ➕</button>
             <button class="btn-mode bg-practice" onclick="prepareGame('sub10')" id="txt-btn-sub10">10或以內減法 ➖</button>
@@ -138,10 +117,6 @@
         </div>
     </div>
     
-    <div id="view-challenge" class="main-view">
-        <button class="btn-mode bg-challenge" onclick="prepareGame('mix')" id="txt-btn-mix">混合加減大挑戰 🔀</button>
-    </div>
-
     <div id="view-leaderboard" class="main-view">
         <div class="lb-tabs">
             <button class="lb-tab lb-tab-home active" id="tab-home-world" onclick="switchTab('world')">World</button>
@@ -152,12 +127,13 @@
     </div>
 
     <div id="view-mistakes" class="main-view">
+        <button onclick="startMistakePractice()" class="btn-mode" style="background:#ff9800; font-size:1.1rem; padding:15px;" id="txt-btn-redo">🚀 開始再做一次</button>
         <div style="display:flex; gap:10px; margin-bottom:15px;" class="no-print">
             <button onclick="clearGlobalMistakes()" class="btn-mode" style="background:#f44336; margin:0; flex:1;" id="txt-btn-clear">🗑️ 一鍵廢除</button>
             <button onclick="printGlobalMistakes()" class="btn-mode" style="background:#2196f3; margin:0; flex:1;" id="txt-btn-print">🖨️ 全頁印製</button>
         </div>
         <div id="print-area">
-            <h2 class="print-only-title" style="display:none; text-align:center; color:#333; font-family:sans-serif;">📝 錯題再練區 Worksheet</h2>
+            <h2 class="print-only-title" style="display:none; text-align:center;">📝 錯題練習 Worksheet</h2>
             <p id="txt-mistakes-empty" style="color:#888; font-weight:bold;"></p>
             <ul id="global-mistakes-list" style="list-style:none; padding:0; text-align:left;"></ul>
         </div>
@@ -186,7 +162,7 @@
   <div id="result-screen" class="screen">
     <div id="result-header">
         <div style="font-size: 4rem;">💩</div>
-        <h2 id="txt-result-title" style="margin:0; color:#9c27b0;">加減混合大激鬥</h2>
+        <h2 id="txt-result-title">加減混合大激鬥</h2>
     </div>
     <p id="final-stats" style="font-weight:bold; background:#f0f0f0; padding:10px; border-radius:10px; margin:10px 0;"></p>
     <div id="mistakes-section" style="display:none; text-align:left;">
@@ -208,15 +184,14 @@
 <script>
   let score = 0, timeLeft = 30, timerInterval, correctAnswer, gameMode = 'mix';
   let combo = 0, questCount = 0, gameActive = false, isMuted = false, currentLang = 'zh'; 
-  let questionStartTime = 0, wrongQuestions = [];
-  let currentActiveTab = 'world';
+  let questionStartTime = 0, wrongQuestions = [], currentMistakeList = [];
+  let currentActiveTab = 'world', isMistakeMode = false;
 
   window.onload = () => {
     const savedName = localStorage.getItem("mathPoo_Name");
     if (savedName) document.getElementById("player-name").value = savedName;
     updateStaticText();
     renderLeaderboard();
-    renderGlobalMistakes();
   };
 
   const i18n = {
@@ -225,10 +200,9 @@
         tabPractice: "Practice", tabChallenge: "Challenge", tabLb: "Leaderboard", tabMistakes: "Mistakes",
         add10: "Add (within 10) ➕", sub10: "Sub (within 10) ➖",
         add20: "Add (within 20) ➕", sub20: "Sub (within 20) ➖", 
-        mix: "Mixed Battle 🔀", 
+        mix: "Mixed Battle 🔀", redo: "🚀 Start Re-do",
         clearMistakes: "🗑️ Clear All", printMistakes: "🖨️ Print Page",
-        clearConfirm: "Clear all saved mistakes?", printEmpty: "No mistakes to print!", mistakesEmpty: "Awesome! No mistakes yet.",
-        quest: "Quest", resultTitle: "Mixed Math Battle!", home: "Back to Home",
+        quest: "Quest", resultTitle: "Game Over!", home: "Back to Home",
         scoreLabel: "Total Score", questLabel: "Correct", wrongTitle: "⚠️ Review Mistakes:",
         pos: ["Fast!", "Perfect!", "Well Done!"], neg: ["Try again!", "Almost!"]
     },
@@ -237,9 +211,8 @@
         tabPractice: "練習區", tabChallenge: "挑戰區", tabLb: "龍虎榜", tabMistakes: "錯題再練",
         add10: "10或以內加法 ➕", sub10: "10或以內減法 ➖",
         add20: "20或以內加法 ➕", sub20: "20或以內減法 ➖", 
-        mix: "混合加減大激鬥 🔀",
+        mix: "混合加減大激鬥 🔀", redo: "🚀 開始再做一次",
         clearMistakes: "🗑️ 一鍵廢除", printMistakes: "🖨️ 全頁印製",
-        clearConfirm: "確定要一鍵廢除所有錯題嗎？", printEmpty: "沒有錯題可以印製！", mistakesEmpty: "太棒了！暫時沒有錯題。",
         quest: "題數", resultTitle: "加減混合大激鬥", home: "返回主頁",
         scoreLabel: "總得分", questLabel: "答對題數", wrongTitle: "⚠️ 錯題檢討：",
         pos: ["神速！", "完美！", "做得好！"], neg: ["加油！", "再試一次！"]
@@ -259,8 +232,9 @@
     document.querySelectorAll(".l-quest").forEach(el => el.innerText = t.quest);
     document.getElementById("tab-main-practice").innerText = t.tabPractice;
     document.getElementById("tab-main-challenge").innerText = t.tabChallenge;
-    document.getElementById("tab-main-lb").innerText = t.tabLb;
+    document.getElementById("tab-main-leaderboard").innerText = t.tabLb;
     document.getElementById("tab-main-mistakes").innerText = t.tabMistakes;
+    document.getElementById("txt-btn-redo").innerText = t.redo;
     document.getElementById("txt-btn-clear").innerText = t.clearMistakes;
     document.getElementById("txt-btn-print").innerText = t.printMistakes;
     document.getElementById("txt-btn-add10").innerText = t.add10;
@@ -278,7 +252,6 @@
     document.getElementById(`tab-main-${tab}`).classList.add('active');
     document.querySelectorAll('.main-view').forEach(v => v.classList.remove('active'));
     document.getElementById(`view-${tab}`).classList.add('active');
-
     if(tab === 'leaderboard') renderLeaderboard();
     if(tab === 'mistakes') renderGlobalMistakes();
   }
@@ -287,38 +260,26 @@
       let globalM = JSON.parse(localStorage.getItem("mathPoo_GlobalMistakes")) || [];
       const container = document.getElementById("global-mistakes-list");
       const emptyTxt = document.getElementById("txt-mistakes-empty");
+      const redoBtn = document.getElementById("txt-btn-redo");
       container.innerHTML = "";
       if (globalM.length === 0) {
-          emptyTxt.innerText = i18n[currentLang].mistakesEmpty;
+          emptyTxt.innerText = i18n[currentLang].mistakesEmpty || "暫無錯題";
           emptyTxt.style.display = "block";
+          redoBtn.style.display = "none";
       } else {
           emptyTxt.style.display = "none";
+          redoBtn.style.display = "block";
           globalM.forEach(m => {
-              container.innerHTML += `
-              <li>
-                  <div style="flex:1;"><span class="q-text" style="font-size:1.2rem;">${m.q} = </span>
-                  <span class="correct-part q-ans" style="font-size:1.2rem;">${m.right}</span>
-                  <span class="print-blank" style="display:none; font-family:monospace;">______</span></div>
-                  <div class="mistake-item q-wrong" style="font-size:0.9rem;">(你答: ${m.yours})</div>
-              </li>`;
+              container.innerHTML += `<li><span class="q-text" style="font-size:1.2rem;">${m.q} = ?</span><span class="print-blank" style="display:none; border-bottom:1px solid #000; width:50px;">____</span></li>`;
           });
       }
   }
 
-  function clearGlobalMistakes() {
-      if(confirm(i18n[currentLang].clearConfirm)) {
-          localStorage.removeItem("mathPoo_GlobalMistakes");
-          renderGlobalMistakes();
-      }
-  }
-
-  function printGlobalMistakes() {
-      let globalM = JSON.parse(localStorage.getItem("mathPoo_GlobalMistakes")) || [];
-      if(globalM.length === 0) {
-          alert(i18n[currentLang].printEmpty);
-          return;
-      }
-      window.print();
+  function startMistakePractice() {
+      currentMistakeList = JSON.parse(localStorage.getItem("mathPoo_GlobalMistakes")) || [];
+      if(currentMistakeList.length === 0) return;
+      isMistakeMode = true;
+      prepareGame('mistake-redo');
   }
 
   function prepareGame(mode) {
@@ -331,6 +292,7 @@
   function startGame(name) {
     score = 0; combo = 0; questCount = 0; timeLeft = 30; wrongQuestions = []; gameActive = true;
     document.getElementById("score").innerText = "0";
+    document.getElementById("time-container").classList.remove("time-warning");
     showScreen("game-screen");
     timerInterval = setInterval(() => {
       timeLeft--;
@@ -342,18 +304,31 @@
   }
 
   function generateQuestion() {
-    let limit = (gameMode.includes('10')) ? 10 : 20;
-    let op = gameMode.startsWith('sub') ? 'sub' : (gameMode === 'mix' ? (Math.random() > 0.5 ? 'add' : 'sub') : 'add');
-    let n1, n2;
-    if (op === 'add') {
-        n1 = Math.floor(Math.random() * (limit + 1)); n2 = Math.floor(Math.random() * (limit + 1));
-        correctAnswer = n1 + n2; document.getElementById("op-sign").innerText = "+";
+    let n1, n2, opSign;
+    if (isMistakeMode) {
+        if(currentMistakeList.length === 0) { clearInterval(timerInterval); endGame(localStorage.getItem("mathPoo_Name")); return; }
+        let idx = Math.floor(Math.random() * currentMistakeList.length);
+        let m = currentMistakeList.splice(idx, 1)[0];
+        // 題目解析
+        let parts = m.q.split(' ');
+        n1 = parseInt(parts[0]); opSign = parts[1]; n2 = parseInt(parts[2]);
+        correctAnswer = m.right;
     } else {
-        n1 = Math.floor(Math.random() * (limit + 1)); n2 = Math.floor(Math.random() * (n1 + 1));
-        correctAnswer = n1 - n2; document.getElementById("op-sign").innerText = "-";
+        let limit = (gameMode.includes('10')) ? 10 : 20;
+        let op = gameMode.startsWith('sub') ? 'sub' : (gameMode === 'mix' ? (Math.random() > 0.5 ? 'add' : 'sub') : 'add');
+        if (op === 'add') {
+            n1 = Math.floor(Math.random() * (limit + 1)); n2 = Math.floor(Math.random() * (limit + 1));
+            correctAnswer = n1 + n2; opSign = "+";
+        } else {
+            n1 = Math.floor(Math.random() * (limit + 1)); n2 = Math.floor(Math.random() * (n1 + 1));
+            correctAnswer = n1 - n2; opSign = "-";
+        }
     }
-    document.getElementById("num1").innerText = n1; document.getElementById("num2").innerText = n2;
+    document.getElementById("num1").innerText = n1;
+    document.getElementById("num2").innerText = n2;
+    document.getElementById("op-sign").innerText = opSign;
     questionStartTime = Date.now();
+    
     let opts = [correctAnswer];
     while (opts.length < 4) {
       let w = correctAnswer + (Math.floor(Math.random() * 7) - 3);
@@ -364,36 +339,34 @@
     container.innerHTML = "";
     opts.forEach(opt => {
       const btn = document.createElement("button"); btn.className = "option-btn"; btn.innerText = opt;
-      btn.onclick = () => handleAnswer(opt, n1, n2, op, btn);
+      btn.onclick = () => handleAnswer(opt, n1, n2, opSign, btn);
       container.appendChild(btn);
     });
   }
 
-  function handleAnswer(selected, n1, n2, op, btn) {
+  function handleAnswer(selected, n1, n2, opSign, btn) {
     if(!gameActive) return;
     const fb = document.getElementById("feedback-msg");
     const sp = document.getElementById("score-popup");
     fb.classList.remove("pop-feedback");
     
     if (selected === correctAnswer) {
-      let timeUsed = (Date.now() - questionStartTime) / 1000;
-      let earned = Math.max(1, 10 - Math.floor(timeUsed / 0.5)) * (++combo);
+      let earned = Math.max(1, 10 - Math.floor((Date.now() - questionStartTime) / 500)) * (++combo);
       score += earned; questCount++;
       fb.innerText = i18n[currentLang].pos[Math.floor(Math.random()*3)];
       fb.style.color = "#4CAF50";
-      sp.innerText = `+${earned} (x${combo})`; sp.style.color = "#ff9800";
+      sp.innerText = `+${earned}`; sp.style.color = "#ff9800";
     } else {
       score = Math.max(0, score - 10); combo = 0;
-      let questionStr = `${n1} ${op==='add'?'+':'-'} ${n2}`;
-      wrongQuestions.push({ q: questionStr, right: correctAnswer, yours: selected });
-      
-      // 寫入錯題再練區 (避免重複)
-      let globalM = JSON.parse(localStorage.getItem("mathPoo_GlobalMistakes")) || [];
-      if (!globalM.some(m => m.q === questionStr)) {
-          globalM.push({ q: questionStr, right: correctAnswer, yours: selected });
-          localStorage.setItem("mathPoo_GlobalMistakes", JSON.stringify(globalM));
+      let qStr = `${n1} ${opSign} ${n2}`;
+      wrongQuestions.push({ q: qStr, right: correctAnswer, yours: selected });
+      if(!isMistakeMode) {
+          let globalM = JSON.parse(localStorage.getItem("mathPoo_GlobalMistakes")) || [];
+          if (!globalM.some(m => m.q === qStr)) {
+              globalM.push({ q: qStr, right: correctAnswer, yours: selected });
+              localStorage.setItem("mathPoo_GlobalMistakes", JSON.stringify(globalM));
+          }
       }
-
       fb.innerText = i18n[currentLang].neg[Math.floor(Math.random()*2)];
       fb.style.color = "#f44336";
       sp.innerText = "-10 ❗"; sp.style.color = "#f44336";
@@ -405,12 +378,11 @@
   }
 
   function endGame(name) {
-    gameActive = false; showScreen("result-screen");
+    gameActive = false; isMistakeMode = false;
+    showScreen("result-screen");
     const t = i18n[currentLang];
-    const flagInput = document.getElementById("player-country").value;
-    
-    document.getElementById("final-stats").innerText = `${flagInput} ${name}\n${t.scoreLabel}: ${score} | ${t.questLabel}: ${questCount}`;
-    document.getElementById("txt-result-title").innerText = t.resultTitle;
+    const flag = document.getElementById("player-country").value;
+    document.getElementById("final-stats").innerText = `${flag} ${name}\n${t.scoreLabel}: ${score} | ${t.questLabel}: ${questCount}`;
 
     const mList = document.getElementById("mistakes-list");
     mList.innerHTML = "";
@@ -423,7 +395,7 @@
 
     if(gameMode === 'mix') {
         let lb = JSON.parse(localStorage.getItem("mathPooLB_V4")) || [];
-        lb.push({ name, flag: flagInput, score, region: flagInput, date: new Date().toLocaleDateString() });
+        lb.push({ name, flag, score, region: flag, date: new Date().toLocaleDateString() });
         localStorage.setItem("mathPooLB_V4", JSON.stringify(lb));
         switchTab('world');
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
@@ -432,43 +404,31 @@
 
   function renderLeaderboard() {
       let lb = JSON.parse(localStorage.getItem("mathPooLB_V4")) || [];
-      let currentFlag = document.getElementById("player-country").value;
-      let currentName = document.getElementById("player-name").value;
-      let filtered = lb;
-      if (currentActiveTab === 'personal') filtered = lb.filter(e => e.name === currentName);
-      else if (currentActiveTab === 'regional') filtered = lb.filter(e => e.region === currentFlag);
-      
+      let flag = document.getElementById("player-country").value;
+      let name = document.getElementById("player-name").value;
+      let filtered = (currentActiveTab === 'personal') ? lb.filter(e => e.name === name) : (currentActiveTab === 'regional' ? lb.filter(e => e.region === flag) : lb);
       let html = "";
       filtered.sort((a,b) => b.score - a.score).slice(0,20).forEach((e, i) => {
           html += `<li><span>${i+1}. ${e.flag} ${e.name}</span><b>${e.score}</b></li>`;
       });
-      
-      const listHome = document.getElementById("leaderboard-list-home");
-      const listResult = document.getElementById("leaderboard-list-result");
-      if(listHome) listHome.innerHTML = html;
-      if(listResult) listResult.innerHTML = html;
+      document.getElementById("leaderboard-list-home").innerHTML = html;
+      document.getElementById("leaderboard-list-result").innerHTML = html;
   }
 
   function switchTab(tab) {
       currentActiveTab = tab;
-      ['home', 'result'].forEach(prefix => {
-          document.querySelectorAll(`.lb-tab-${prefix}`).forEach(b => b.classList.remove('active'));
-          let btn = document.getElementById(`tab-${prefix}-${tab}`);
-          if(btn) btn.classList.add('active');
-      });
+      document.querySelectorAll('.lb-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll(`[id$='-${tab}']`).forEach(b => b.classList.add('active'));
       renderLeaderboard();
   }
 
-  function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+  function clearGlobalMistakes() {
+      if(confirm("確定廢除所有紀錄？")) { localStorage.removeItem("mathPoo_GlobalMistakes"); renderGlobalMistakes(); }
   }
 
-  function returnToHome() {
-    showScreen("start-screen");
-    renderGlobalMistakes(); // 更新可能新增的錯題
-  }
-
+  function printGlobalMistakes() { window.print(); }
+  function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+  function returnToHome() { showScreen("start-screen"); renderGlobalMistakes(); }
   function toggleMute() { isMuted = !isMuted; document.getElementById("mute-btn").innerText = isMuted ? "🔇" : "🎵"; }
 </script>
 </body>
