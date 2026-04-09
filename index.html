@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💩 Math Master - World Challenge 3.4</title>
+<title>加減混合大激鬥 - 💩 Math Master 3.7</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   body { font-family: 'Segoe UI', system-ui, sans-serif; text-align: center; background-color: #fff9c4; margin: 0; padding: 20px; touch-action: manipulation; }
@@ -39,8 +39,8 @@
   .mode-label { font-size: 0.8rem; color: #666; margin-top: 15px; text-align: left; font-weight: bold; border-left: 4px solid #ffc107; padding-left: 8px;}
   
   .input-row { display: flex; gap: 10px; margin-bottom: 10px; justify-content: center; }
-  #player-country { font-size: 1.2rem; padding: 5px; border-radius: 8px; border: 2px solid #ddd; width: 35%; }
-  #player-name { font-size: 1.2rem; padding: 10px; border-radius: 8px; border: 2px solid #ddd; width: 60%; }
+  #player-country { font-size: 1.1rem; padding: 5px; border-radius: 8px; border: 2px solid #ddd; width: 40%; }
+  #player-name { font-size: 1.2rem; padding: 10px; border-radius: 8px; border: 2px solid #ddd; width: 55%; }
 
   .lb-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
   .lb-tab { flex: 1; padding: 10px; border: none; border-radius: 8px; background: #eee; cursor: pointer; font-weight: bold; }
@@ -65,21 +65,44 @@
   </div>
 
   <div id="start-screen" class="screen active">
-    <h1 id="txt-title">💩 Math Mastery</h1>
-    <p id="txt-subtitle">30 Seconds Challenge!</p>
+    <h1 id="txt-title" style="margin-bottom:10px;">加減混合大激鬥 💩</h1>
+    <p id="txt-subtitle" style="font-weight:bold; color:#795548; line-height:1.4;">30秒鬥快鬥準，爆出最多最多嘅可愛poo poo</p>
     
     <div class="input-row">
       <select id="player-country">
-        <option value="🇭🇰">🇭🇰 HK</option>
-        <option value="🇲🇴">🇲🇴 MO</option>
-        <option value="🇹🇼">🇹🇼 TW</option>
-        <option value="🇨🇳">🇨🇳 CN</option>
-        <option value="🌍">🌍 Earth</option>
+        <optgroup label="亞洲與地區">
+            <option value="🇭🇰" selected>🇭🇰 香港 HK</option>
+            <option value="🇲🇴">🇲🇴 澳門 MO</option>
+            <option value="🇹🇼">🇹🇼 台灣 TW</option>
+            <option value="🇨🇳">🇨🇳 中國 CN</option>
+            <option value="🇯🇵">🇯🇵 日本 JP</option>
+            <option value="🇰🇷">🇰🇷 韓國 KR</option>
+            <option value="🇸🇬">🇸🇬 新加坡 SG</option>
+            <option value="🇲🇾">🇲🇾 馬來西亞 MY</option>
+            <option value="🇹🇭">🇹🇭 泰國 TH</option>
+            <option value="🇻🇳">🇻🇳 越南 VN</option>
+        </optgroup>
+        <optgroup label="歐美與其他">
+            <option value="🇬🇧">🇬🇧 英國 UK</option>
+            <option value="🇺🇸">🇺🇸 美國 US</option>
+            <option value="🇨🇦">🇨🇦 加拿大 CA</option>
+            <option value="🇦🇺">🇦🇺 澳洲 AU</option>
+            <option value="🇫🇷">🇫🇷 法國 FR</option>
+            <option value="🇩🇪">🇩🇪 德國 DE</option>
+            <option value="🇮🇹">🇮🇹 意大利 IT</option>
+            <option value="🇪🇸">🇪🇸 西班牙 ES</option>
+        </optgroup>
+        <optgroup label="趣味選擇">
+            <option value="🌍">🌍 地球人 Earth</option>
+            <option value="🇺🇳">🇺🇳 聯合國 UN</option>
+            <option value="🏴‍☠️">🏴‍☠️ 海盜 Pirate</option>
+            <option value="🏁">🏁 賽車手 Racing</option>
+        </optgroup>
       </select>
       <input type="text" id="player-name" placeholder="Name / 名字" maxlength="10">
     </div>
     
-    <div class="mode-label" id="txt-label-practice">PRACTICE AREA</div>
+    <div class="mode-label" id="txt-label-practice">練習區</div>
     <div class="options-grid">
         <button class="btn-mode bg-practice" onclick="prepareGame('add10')" id="txt-btn-add10">10或以內加法 ➕</button>
         <button class="btn-mode bg-practice" onclick="prepareGame('sub10')" id="txt-btn-sub10">10或以內減法 ➖</button>
@@ -87,16 +110,16 @@
         <button class="btn-mode bg-practice" onclick="prepareGame('sub20')" id="txt-btn-sub20">20或以內減法 ➖</button>
     </div>
     
-    <div class="mode-label" id="txt-label-challenge">CHALLENGE ZONE</div>
+    <div class="mode-label" id="txt-label-challenge">挑戰區</div>
     <button class="btn-mode bg-challenge" onclick="prepareGame('mix')" id="txt-btn-mix">混合加減大挑戰 🔀</button>
-    <button class="btn-mode bg-view-lb" onclick="openLeaderboardOnly()" id="txt-btn-viewlb">🏆 View Leaderboard</button>
+    <button class="btn-mode bg-view-lb" onclick="openLeaderboardOnly()" id="txt-btn-viewlb">🏆 查看龍虎榜</button>
   </div>
 
   <div id="game-screen" class="screen">
     <div class="stats">
       <div><span class="l-quest">題數</span>: <span id="quest-count">0</span></div>
       <div id="time-container">⏱ <span id="time">30</span>s</div>
-      <div style="color:#1976d2">⭐ <span id="score">0</span></div>
+      <div style="color:#795548">💩 <span id="score">0</span></div>
     </div>
     <div style="display:flex; justify-content: space-between; align-items:center;">
         <div id="feedback-msg">Ready?</div>
@@ -116,14 +139,11 @@
         <div style="font-size: 4rem;">💩</div>
         <h2 id="txt-result-title" style="margin:0; color:#9c27b0;">加減混合大激鬥</h2>
     </div>
-    
     <p id="final-stats" style="font-weight:bold; background:#f0f0f0; padding:10px; border-radius:10px; margin:10px 0;"></p>
-
     <div id="mistakes-section" style="display:none; text-align:left;">
         <b id="txt-wrong-title">⚠️ 錯題檢討：</b>
         <ul id="mistakes-list"></ul>
     </div>
-
     <div id="record-section" style="margin-top:15px;">
         <div class="lb-tabs">
             <button class="lb-tab active" id="tab-world" onclick="switchTab('world')">World</button>
@@ -142,7 +162,6 @@
   let questionStartTime = 0, wrongQuestions = [];
   let currentActiveTab = 'world';
 
-  // 1. 記憶玩家名字
   window.onload = () => {
     const savedName = localStorage.getItem("mathPoo_Name");
     if (savedName) document.getElementById("player-name").value = savedName;
@@ -151,7 +170,8 @@
 
   const i18n = {
     en: {
-        title: "💩 Math Mastery", practice: "PRACTICE AREA", challenge: "CHALLENGE ZONE",
+        title: "Mixed Math Battle! 💩", subtitle: "30s speed & accuracy challenge to pop cute poos!",
+        practice: "PRACTICE AREA", challenge: "CHALLENGE ZONE",
         add10: "Add (within 10) ➕", sub10: "Sub (within 10) ➖",
         add20: "Add (within 20) ➕", sub20: "Sub (within 20) ➖", 
         mix: "Mixed Battle 🔀", viewlb: "🏆 Leaderboard",
@@ -160,7 +180,8 @@
         pos: ["Fast!", "Perfect!", "Well Done!"], neg: ["Try again!", "Almost!"]
     },
     zh: {
-        title: "💩 算術大師", practice: "練習區", challenge: "挑戰區",
+        title: "加減混合大激鬥 💩", subtitle: "30秒鬥快鬥準，爆出最多最多嘅可愛poo poo",
+        practice: "練習區", challenge: "挑戰區",
         add10: "10或以內加法 ➕", sub10: "10或以內減法 ➖",
         add20: "20或以內加法 ➕", sub20: "20或以內減法 ➖", 
         mix: "混合加減大激鬥 🔀", viewlb: "🏆 查看龍虎榜",
@@ -179,7 +200,10 @@
   function updateStaticText() {
     const t = i18n[currentLang];
     document.getElementById("txt-title").innerText = t.title;
+    document.getElementById("txt-subtitle").innerText = t.subtitle;
     document.querySelectorAll(".l-quest").forEach(el => el.innerText = t.quest);
+    document.getElementById("txt-label-practice").innerText = t.practice;
+    document.getElementById("txt-label-challenge").innerText = t.challenge;
     document.getElementById("txt-btn-add10").innerText = t.add10;
     document.getElementById("txt-btn-sub10").innerText = t.sub10;
     document.getElementById("txt-btn-add20").innerText = t.add20;
@@ -214,34 +238,25 @@
     let limit = (gameMode.includes('10')) ? 10 : 20;
     let op = gameMode.startsWith('sub') ? 'sub' : (gameMode === 'mix' ? (Math.random() > 0.5 ? 'add' : 'sub') : 'add');
     let n1, n2;
-
     if (op === 'add') {
-        n1 = Math.floor(Math.random() * (limit + 1));
-        n2 = Math.floor(Math.random() * (limit + 1));
-        correctAnswer = n1 + n2;
-        document.getElementById("op-sign").innerText = "+";
+        n1 = Math.floor(Math.random() * (limit + 1)); n2 = Math.floor(Math.random() * (limit + 1));
+        correctAnswer = n1 + n2; document.getElementById("op-sign").innerText = "+";
     } else {
-        n1 = Math.floor(Math.random() * (limit + 1));
-        n2 = Math.floor(Math.random() * (n1 + 1));
-        correctAnswer = n1 - n2;
-        document.getElementById("op-sign").innerText = "-";
+        n1 = Math.floor(Math.random() * (limit + 1)); n2 = Math.floor(Math.random() * (n1 + 1));
+        correctAnswer = n1 - n2; document.getElementById("op-sign").innerText = "-";
     }
-    document.getElementById("num1").innerText = n1;
-    document.getElementById("num2").innerText = n2;
+    document.getElementById("num1").innerText = n1; document.getElementById("num2").innerText = n2;
     questionStartTime = Date.now();
-    
     let opts = [correctAnswer];
     while (opts.length < 4) {
       let w = correctAnswer + (Math.floor(Math.random() * 7) - 3);
       if (w >= 0 && !opts.includes(w)) opts.push(w);
     }
     opts.sort(() => Math.random() - 0.5);
-    
     const container = document.getElementById("options-container");
     container.innerHTML = "";
     opts.forEach(opt => {
-      const btn = document.createElement("button");
-      btn.className = "option-btn"; btn.innerText = opt;
+      const btn = document.createElement("button"); btn.className = "option-btn"; btn.innerText = opt;
       btn.onclick = () => handleAnswer(opt, n1, n2, op, btn);
       container.appendChild(btn);
     });
@@ -252,7 +267,6 @@
     const fb = document.getElementById("feedback-msg");
     const sp = document.getElementById("score-popup");
     fb.classList.remove("pop-feedback");
-    
     if (selected === correctAnswer) {
       let timeUsed = (Date.now() - questionStartTime) / 1000;
       let earned = Math.max(1, 10 - Math.floor(timeUsed / 0.5)) * (++combo);
@@ -261,9 +275,7 @@
       fb.style.color = "#4CAF50";
       sp.innerText = `+${earned} (x${combo})`; sp.style.color = "#ff9800";
     } else {
-      // 2. 答錯扣 10 分邏輯
-      score = Math.max(0, score - 10);
-      combo = 0;
+      score = Math.max(0, score - 10); combo = 0;
       wrongQuestions.push({ q: `${n1} ${op==='add'?'+':'-'} ${n2}`, right: correctAnswer, yours: selected });
       fb.innerText = i18n[currentLang].neg[Math.floor(Math.random()*2)];
       fb.style.color = "#f44336";
@@ -276,16 +288,13 @@
   }
 
   function endGame(name) {
-    gameActive = false;
-    showScreen("leaderboard-screen");
+    gameActive = false; showScreen("leaderboard-screen");
     const t = i18n[currentLang];
-    const flag = document.getElementById("player-country").value;
+    const flagInput = document.getElementById("player-country").value;
     
-    // 結算中文顯示
-    document.getElementById("final-stats").innerText = `${flag} ${name}\n${t.scoreLabel}: ${score} | ${t.questLabel}: ${questCount}`;
+    document.getElementById("final-stats").innerText = `${flagInput} ${name}\n${t.scoreLabel}: ${score} | ${t.questLabel}: ${questCount}`;
     document.getElementById("txt-result-title").innerText = t.resultTitle;
 
-    // 顯示錯題
     const mList = document.getElementById("mistakes-list");
     mList.innerHTML = "";
     if(wrongQuestions.length > 0) {
@@ -293,13 +302,11 @@
         wrongQuestions.forEach(m => {
             mList.innerHTML += `<li><span>${m.q} = <span class="correct-part">${m.right}</span></span> <span class="mistake-item">(你選了 ${m.yours})</span></li>`;
         });
-    } else {
-        document.getElementById("mistakes-section").style.display = "none";
-    }
+    } else { document.getElementById("mistakes-section").style.display = "none"; }
 
     if(gameMode === 'mix') {
         let lb = JSON.parse(localStorage.getItem("mathPooLB_V4")) || [];
-        lb.push({ name, flag, score, region: flag, date: new Date().toLocaleDateString() });
+        lb.push({ name, flag: flagInput, score, region: flagInput, date: new Date().toLocaleDateString() });
         localStorage.setItem("mathPooLB_V4", JSON.stringify(lb));
         switchTab('world');
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
@@ -312,11 +319,9 @@
       let lb = JSON.parse(localStorage.getItem("mathPooLB_V4")) || [];
       let currentFlag = document.getElementById("player-country").value;
       let currentName = document.getElementById("player-name").value;
-
       let filtered = lb;
       if (currentActiveTab === 'personal') filtered = lb.filter(e => e.name === currentName);
       else if (currentActiveTab === 'regional') filtered = lb.filter(e => e.region === currentFlag);
-
       filtered.sort((a,b) => b.score - a.score).slice(0,20).forEach((e, i) => {
           list.innerHTML += `<li><span>${i+1}. ${e.flag} ${e.name}</span><b>${e.score}</b></li>`;
       });
